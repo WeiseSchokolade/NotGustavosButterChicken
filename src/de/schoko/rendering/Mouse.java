@@ -20,12 +20,32 @@ public class Mouse implements MouseListener, MouseMotionListener {
 		panel.addMouseMotionListener(this);
 	}
 	
+	/**
+	 * @return The x position of the mouse in the coordinate system
+	 */
 	public double getX() {
 		return context.getLastGraph().convBackFromSX(x);
 	}
-	
+
+	/**
+	 * @return The y position of the mouse in the coordinate system
+	 */
 	public double getY() {
 		return context.getLastGraph().convBackFromSY(y);
+	}
+	
+	/**
+	 * @return The x position of the mouse in the actual frame
+	 */
+	public double getScreenX() {
+		return x;
+	}
+
+	/**
+	 * @return The y position of the mouse in the actual frame
+	 */
+	public double getScreenY() {
+		return y;
 	}
 	
 	public boolean isPressed(int buttonNumber) {
