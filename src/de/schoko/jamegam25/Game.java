@@ -9,17 +9,8 @@ import de.schoko.rendering.Context;
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
-import de.schoko.rendering.Renderer;
-import de.schoko.rendering.Window;
 
-public class Game extends Renderer{
-	public static void main(String[] args) {
-		Window window = new Window(new Game(), "Jame Gam 25");
-		window.getSettings().setBackgroundColor(0, 0, 127);
-		window.getSettings().setRenderCoordinateSystem(false);
-		window.open();
-	}
-
+public class Game extends Menu {
 	private Player player;
 	private Tile[][] tiles;
 	private ArrayList<GameObject> gameObjects;
@@ -42,7 +33,7 @@ public class Game extends Renderer{
 			@Override
 			public CameraPathPoint getPoint(Camera camera, double deltaTimeMS) {
 				t += deltaTimeMS / 1000;
-				return new CameraPathPoint(player.getX(), player.getY() + Math.sin(t) * 0.25);
+				return new CameraPathPoint(player.getX(), player.getY() + Math.sin(t) * 0.25, 50);
 			}
 		});
 
