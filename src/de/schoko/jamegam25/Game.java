@@ -60,7 +60,7 @@ public class Game extends Menu {
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles.length / 2 + 0.5, imagePool.getImage("tile"), 16);
+				tiles[x][y] = new Tile(x - width / 2 + 0.5, y - height / 2 + 0.5, imagePool.getImage("tile"), 16);
 			}			
 		}
 	}
