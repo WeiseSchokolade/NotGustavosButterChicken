@@ -16,6 +16,7 @@ public class Context {
 		this.keyboard = keyboard;
 		this.mouse = mouse;
 		this.imagePool = imagePool;
+		this.mouse.setContext(this);
 	}
 	
 	void setCamera(Camera camera) {

@@ -36,6 +36,7 @@ public class Window {
 				new Keyboard(),
 				new Mouse(panel),
 				new ImagePool());
+		this.panel.setContext(context);
 		this.renderer.setContext(context);
 		this.renderer.onLoad(context);
 		

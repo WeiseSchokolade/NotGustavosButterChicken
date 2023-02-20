@@ -16,6 +16,7 @@ public class Panel extends JPanel {
 	private Camera camera;
 	private Renderer renderer;
 	private RendererSettings rendererSettings;
+	private Context context;
 	
 	private List<Notification> notifications;
     
@@ -54,6 +55,7 @@ public class Panel extends JPanel {
 		
 		if (renderer != null) {
 			Graph graph = new Graph(this, g, this.getWidth(), this.getHeight(), camera, rendererSettings);
+			context.setLastGraph(graph);
 			
 			try {
 				camera.update(deltaTime);
@@ -87,5 +89,9 @@ public class Panel extends JPanel {
 	
 	public Camera getCamera() {
 		return camera;
+	}
+	
+	public void setContext(Context context) {
+		this.context = context;
 	}
 }
