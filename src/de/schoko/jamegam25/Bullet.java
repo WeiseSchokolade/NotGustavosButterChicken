@@ -1,24 +1,38 @@
 package de.schoko.jamegam25;
 
+import java.util.ArrayList;
+
+import java.awt.Color;
+
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.shapes.Circle;
 
 public class Bullet extends GameObject{
-    private double direction;
-    private double speed;
+	private ArrayList<Enemy> enemies;
+	private double direction;
+	private double speed;
 
-    public Bullet(double x, double y, double direction) {
-        super(x, y);
-        this.direction = direction;
-        this.speed = 7;
-    }
+	public Bullet(double x, double y, double direction, ArrayList<Enemy> enemies) {
+		super(x, y);
+		this.direction = direction;
+		this.speed = 7;
+		this.enemies = enemies;
+	}
 
-    @Override
-    public void render(Graph g, double deltaTimeMS) {
-        this.x += Math.cos(direction) * deltaTimeMS / 1000 * speed;
-        this.y += Math.sin(direction) * deltaTimeMS / 1000 * speed;
+	@Override
+	public void render(Graph g, double deltaTimeMS) {
+		this.x += Math.cos(direction) * deltaTimeMS / 1000 * speed;
+		this.y += Math.sin(direction) * deltaTimeMS / 1000 * speed;
 
-        g.draw(new Circle(x, y, 0.1));
-    }
-    
+		for (int i = 0; i < enemies.size(); i++) {
+			Enemy enemy = enemies.get(i);
+			if (distanceTo(enemy) < 0.5) {
+				enemy.remove();
+				this.remove();
+			}
+		}
+
+		g.draw(new Circle(x, y, 0.1, Color.WHITE));
+	}
+	
 }

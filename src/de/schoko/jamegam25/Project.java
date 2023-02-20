@@ -8,8 +8,8 @@ import de.schoko.rendering.Window;
 public class Project extends Renderer {
 	public static void main(String[] args) {
 		Window window = new Window(new Project(), "Jame Gam 25");
-		window.getSettings().setBackgroundColor(0, 0, 127);
 		window.getSettings().setRenderCoordinateSystem(false);
+		window.getSettings().setDisplayStartedNotification(false);
 		window.open();
 	}
 

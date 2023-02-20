@@ -57,7 +57,7 @@ public class Player extends GameObject {
 			double a = mouse.getX() - this.x;
 			double b = mouse.getY() - this.y;
 			double direction = Math.atan2(b, a);
-			game.addObject(new Bullet(this.x, this.y, direction));
+			game.addObject(new Bullet(this.x, this.y, direction, game.getEnemies()));
 		} else if (shootCooldown > 0) {
 			shootCooldown -= deltaTimeMS;
 		}

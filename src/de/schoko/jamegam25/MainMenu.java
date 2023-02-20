@@ -2,6 +2,9 @@ package de.schoko.jamegam25;
 
 import java.io.IOException;
 
+import java.awt.Color;
+import java.awt.Font;
+
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -17,6 +20,8 @@ public class MainMenu extends Menu {
 
 	@Override
 	public void onLoad(Context context) {
+		context.getSettings().setBackgroundColor(78, 188, 208);
+
 		try {
 			sound = new Sound("de/schoko/jamegam25/assets/sound.wav");
 			sound.start();
@@ -38,19 +43,21 @@ public class MainMenu extends Menu {
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
 		Mouse mouse = getContext().getMouse();
-		g.drawString("Game Name", -0.5, 0);
+
+		Font font = new Font("Segoe UI", Font.PLAIN, 25);
+		g.drawString("Game Name", -0.5, 0, Color.BLACK, font);
 		
 		if (mouse.getX() >= -0.5 && mouse.getX() < 0) {
 			if (mouse.getY() <= -0.125 && mouse.getY() >= -0.375) {
-				g.drawString("> Play", -0.5, -0.25);
+				g.drawString("Play", -0.5, -0.25, Color.BLACK, font.deriveFont(30.0f));
 				if  (mouse.isPressed(Mouse.LEFT_BUTTON)) {
 					getProject().setMenu(new Game());
 				}
 			} else {
-				g.drawString("Play", -0.5, -0.25);
+				g.drawString("Play", -0.5, -0.25, Color.BLACK, font);
 			}
 		} else {
-			g.drawString("Play", -0.5, -0.25);
+			g.drawString("Play", -0.5, -0.25, Color.BLACK, font);
 		}
 	}
 }

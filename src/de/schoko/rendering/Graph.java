@@ -54,6 +54,12 @@ public class Graph {
 		debugStrings = new ArrayList<>();
 	}
 	
+	public static Color getColor(int r, int g, int b) {
+		float[] color = Color.RGBtoHSB(r, g, b, null);
+		return Color.getHSBColor(color[0], color[1], color[2]);
+	}
+	
+	
 	public void finalize() {
 		hud.draw();
 		
