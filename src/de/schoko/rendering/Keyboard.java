@@ -51,6 +51,7 @@ public class Keyboard {
 			WINDOWS = KeyEvent.VK_WINDOWS,
 			ESCAPE = KeyEvent.VK_ESCAPE,
 			CONTROL = KeyEvent.VK_CONTROL,
+			TAB = KeyEvent.VK_TAB,
 			ADD = KeyEvent.VK_ADD,
 			PLUS = KeyEvent.VK_PLUS,
 			MINUS = KeyEvent.VK_MINUS,
