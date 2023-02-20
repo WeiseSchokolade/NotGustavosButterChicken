@@ -33,7 +33,7 @@ public class Game extends Menu {
 			@Override
 			public CameraPathPoint getPoint(Camera camera, double deltaTimeMS) {
 				t += deltaTimeMS / 1000;
-				return new CameraPathPoint(player.getX(), player.getY() + Math.sin(t) * 0.25, 50);
+				return new CameraPathPoint(player.getX(), player.getY() + Math.sin(t) * 0.25, 60);
 			}
 		});
 
@@ -42,7 +42,7 @@ public class Game extends Menu {
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage("tile"), 8);
+				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles.length / 2 + 0.5, imagePool.getImage("tile"), 16);
 			}			
 		}
 	}
