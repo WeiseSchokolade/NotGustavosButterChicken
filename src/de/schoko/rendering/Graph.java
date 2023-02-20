@@ -100,6 +100,14 @@ public class Graph {
 		g2D.drawString(s, convSX(x), convSY(y));
 	}
 	
+	public void drawString(String s, double x, double y, Color c, Font font) {
+		Font previousFont = g2D.getFont();
+		g2D.setFont(font);
+		g2D.setColor(c);
+		g2D.drawString(s, convSX(x), convSY(y));
+		g2D.setFont(previousFont);
+	}
+	
 	/**
 	 * Calls {@link Graph#drawPoint(double, double, Color)} with the color black
 	 */
