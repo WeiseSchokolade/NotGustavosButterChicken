@@ -33,6 +33,7 @@ public class Player extends GameObject {
 
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
+		// Moving Part
 		Keyboard keyboard = context.getKeyboard();
 
 		if (keyboard.isPressed(Keyboard.A) || keyboard.isPressed(Keyboard.LEFT)) {
@@ -49,7 +50,7 @@ public class Player extends GameObject {
 			y -= speed * deltaTimeMS / 1000;
 		}
 
-		// Bullet
+		// Shooting Part
 		Mouse mouse = context.getMouse();
 		if (mouse.isPressed(Mouse.LEFT_BUTTON) && shootCooldown <= 0) {
 			shootCooldown = maxShootCooldown;
@@ -61,6 +62,7 @@ public class Player extends GameObject {
 			shootCooldown -= deltaTimeMS;
 		}
 
+		// Drawing Part
 		imageFrame.setX(this.x);
 		imageFrame.setY(this.y);
 		imageFrame.setImage(images[direction]);
