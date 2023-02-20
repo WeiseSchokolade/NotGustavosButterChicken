@@ -31,7 +31,9 @@ public class Panel extends JPanel {
 			camera = new Camera(0, 0, 50);
 		}
 		this.notifications = new ArrayList<>();
-		notifications.add(new Notification("Started", 5));
+		if (rendererSettings.isDisplayingStartedNotification()) {
+			notifications.add(new Notification("Started", 5));
+		}
 		lastRun = System.currentTimeMillis();
 	}
 	
