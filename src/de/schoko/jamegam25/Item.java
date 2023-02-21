@@ -10,7 +10,7 @@ public class Item extends GameObject {
 	private ImageFrame imageFrame;
 
 	public Item(Player player, double x, double y, InventoryItem inventoryItem) {
-		super(x, y);
+		super(x, y, 100);
 		this.player = player;
 		this.inventoryItem = inventoryItem;
 		this.imageFrame = new ImageFrame(x, y, inventoryItem.getImage(), 16 * 2);
@@ -21,10 +21,13 @@ public class Item extends GameObject {
 	public void render(Graph g, double deltaTimeMS) {
 		t += deltaTimeMS / 1000;
 		
-		if (Math.abs(this.player.getX() - this.x) < 0.5 && Math.abs(this.player.getY() - this.y) < 0.5) {
+		if (distanceTo(player) < 0.25) {
 			inventoryItem.setAmount(inventoryItem.getAmount() + 1);
 			this.remove();
 			return;
+		} else if (distanceTo(player) < 1.5) {
+			x += ((player.x - x) / distanceTo(player) * deltaTimeMS / 1000);
+			y += ((player.y - y) / distanceTo(player) * deltaTimeMS / 1000);
 		}
 
 		this.imageFrame.setX(this.getX());

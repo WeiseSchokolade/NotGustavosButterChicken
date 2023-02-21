@@ -10,6 +10,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import de.schoko.rendering.Context;
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.HUDGraph;
+import de.schoko.rendering.Image;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
 import de.schoko.rendering.Keyboard;
@@ -30,6 +31,7 @@ public class IntroMenu extends Menu {
 		imagePool.addImage("pirate", basePath + "pirate.png", ImageLocation.JAR);
 		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
 		imagePool.addImage("backdrop", basePath + "backdrop.png", ImageLocation.JAR);
+		imagePool.addImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
 
 		// Scene Preload
 		SceneRenderer wakeUpRenderer = (HUDGraph hud, Scene scene) -> {
@@ -49,16 +51,35 @@ public class IntroMenu extends Menu {
 		};
 		SceneRenderer antRenderer = (HUDGraph hud, Scene scene) -> {
 			hud.drawRect(0, 0, hud.getWidth(), hud.getHeight(), Graph.getColor(145, 108, 73));
-			hud.drawImage(hud.getWidth() - 25 - (25 / hud.getWidth()), -25, imagePool.getImage("antagonist"), 25 / hud.getWidth());
+			hud.drawImage(hud.getWidth() - imagePool.getImage("antagonist").getAWTImage().getWidth(null) / (25 / hud.getWidth()), -25, imagePool.getImage("antagonist"), 25 / hud.getWidth());
 			drawText(hud);
 		};
+		SceneRenderer butterChickenRenderer = (HUDGraph hud, Scene scene) -> {
+			hud.drawRect(0, 0, hud.getWidth(), hud.getHeight(), Graph.getColor(145, 108, 73));
+			hud.drawImage(-25, -25, imagePool.getImage("pirate"), 25 / hud.getWidth());
+			Image image = imagePool.getImage("butterChicken");
+			java.awt.Image awtImage = image.getAWTImage();
+			hud.drawImage(hud.getWidth() - (awtImage.getWidth(null) / (25 / hud.getWidth()) / 2),
+							hud.getHeight() * 0.25,
+							image,  (50 / hud.getWidth()));
+			drawText(hud);
+		};
+		
 
 		// Scene Loading
 
-		scenes.add(new Scene("", wakeUpRenderer));
-		scenes.add(new Scene("Haha lol this is a test", protRenderer));
-		scenes.add(new Scene("Ok this is the next test \nOKAY????", protRenderer));
-		scenes.add(new Scene("BRUHHHH", antRenderer));
+		scenes.add(new Scene("", "", wakeUpRenderer));
+		scenes.add(new Scene("Gustavo: ", "Henlo I am protagonist Gustavo", protRenderer));
+		scenes.add(new Scene("Mary: ", "Henlo me Mary", antRenderer));
+		scenes.add(new Scene("Gustavo: ", "u-uh w-where am I?", protRenderer));
+		scenes.add(new Scene("Gustavo: ", "Is this a ship?", protRenderer));
+		scenes.add(new Scene("Gustavo: ", "WAIT, WHAT AM I DOING ON SEA?", protRenderer));
+		scenes.add(new Scene("Gustavo: ", "I can't remember anything...", protRenderer));
+		scenes.add(new Scene("Gustavo: ", "What is this in my hand?", protRenderer));
+		scenes.add(new Scene("Gustavo: ", "An infinite supply of butter chicken?", butterChickenRenderer));
+		scenes.add(new Scene("Mary: ", "Hey, you!", antRenderer));
+		scenes.add(new Scene("Mary: ", "You stole my precious butter chicken my grandma made for me!", antRenderer));
+		scenes.add(new Scene("Mary: ", "Get him, boys!!!", antRenderer));
 
 		// First Scene Loading
 		currentScene = scenes.remove(0);
@@ -67,7 +88,6 @@ public class IntroMenu extends Menu {
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
 		HUDGraph hud = g.getHUD();
-		ImagePool imagePool = getContext().getImagePool();
 		Keyboard keyboard = getContext().getKeyboard();
 		
 		
@@ -112,11 +132,13 @@ public class IntroMenu extends Menu {
 	
 	private class Scene {
 		public static final double TIME_PER_CHARACTER = 100;
+		private String prefix;
 		private String text;
 		private double t;
 		private SceneRenderer renderer;
 		
-		public Scene(String text, SceneRenderer renderer) {
+		public Scene(String prefix, String text, SceneRenderer renderer) {
+			this.prefix = prefix; // In this case, prefix means something that is written before the actual text
 			this.text = text;
 			this.renderer = renderer;
 		}
@@ -141,7 +163,7 @@ public class IntroMenu extends Menu {
 		public String getText() {
 			int characterAmount = (int) (t / TIME_PER_CHARACTER);
 			characterAmount = (characterAmount > text.length()) ? text.length() : characterAmount;
-			return text.substring(0, characterAmount);
+			return prefix + text.substring(0, characterAmount);
 		}
 
 		public void skipToEnd() {
@@ -149,7 +171,7 @@ public class IntroMenu extends Menu {
 		}
 
 		public boolean isComplete() {
-			return (getText().equals(text));
+			return (getText().equals(prefix + text));
 		}
 
 		public double getT() {

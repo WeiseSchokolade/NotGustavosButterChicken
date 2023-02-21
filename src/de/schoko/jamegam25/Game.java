@@ -36,8 +36,8 @@ public class Game extends Menu {
 		this.enemies = new ArrayList<>();
 		this.tiles = new Tile[20][10];
 		this.inventory = new InventoryItem[4];
-		width = tiles.length;
-		height = tiles[0].length;
+		width = tiles.length - 2;
+		height = tiles[0].length - 2;
 
 		// Loading Stuff
 		String basePath = "de/schoko/jamegam25/assets/";
@@ -51,6 +51,12 @@ public class Game extends Menu {
 		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
 		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
 		imagePool.addImage("soda", basePath + "soda.png", ImageLocation.JAR);
+		imagePool.addImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
+		imagePool.addImage("butterChickenShadow", basePath + "butter_chicken_shadow.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s0", basePath + "puddle_s0.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s1", basePath + "puddle_s1.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s2", basePath + "puddle_s2.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
 		
 		// Item Setup Part
 		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
@@ -82,7 +88,7 @@ public class Game extends Menu {
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(x - width / 2 + 0.5, y - height / 2 + 0.5, imagePool.getImage("tile"), 16);
+				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage("tile"), 16);
 			}
 		}
 	}
@@ -115,6 +121,32 @@ public class Game extends Menu {
 			}
 		}
 
+		// Rendering
+		for (int x = 0; x < tiles.length; x++) {
+			for (int y = 0; y < tiles[x].length; y++) {
+				if (tiles[x][y] != null) {
+					tiles[x][y].render(g, deltaTimeMS);
+				}
+			}
+		}
+		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
+		
+
+		for (int i = 0; i < gameObjects.size(); i++) {
+			gameObjects.get(i).render(g, deltaTimeMS);
+		}
+		
+		for (int i = 0; i < enemies.size(); i++) {
+			enemies.get(i).render(g, deltaTimeMS);
+		}
+
+		player.render(g, deltaTimeMS);
+
+		// Removing objects that are marked as removed
+		gameObjects.removeIf((GameObject gameObject) -> {
+			return gameObject.isRemoved();
+		});
+		
 		// Inventory Part
 		if (getContext().getKeyboard().isPressed(Keyboard.TAB)) {
 			double extraSpacing = 25;
@@ -170,31 +202,6 @@ public class Game extends Menu {
 			hud.drawText(text, hud.getWidth() / 2 - textWidth / 2, 25, Color.WHITE, font);
 		}
 
-		// Rendering Part
-		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (tiles[x][y] != null) {
-					tiles[x][y].render(g, deltaTimeMS);
-				}
-			}
-		}
-		
-		for (int i = 0; i < enemies.size(); i++) {
-			enemies.get(i).render(g, deltaTimeMS);
-		}
-
-		for (int i = 0; i < gameObjects.size(); i++) {
-			gameObjects.get(i).render(g, deltaTimeMS);
-		}
-
-		player.render(g, deltaTimeMS);
-
-		// Removing objects that are marked as removed
-		gameObjects.removeIf((GameObject gameObject) -> {
-			return gameObject.isRemoved();
-		});
-
 		// HUD Rendering Part
 		hud.drawText("Wave: " + wave, 5, 25, Color.RED, new Font("Segoe UI", Font.BOLD, 25));
 		
@@ -229,6 +236,9 @@ public class Game extends Menu {
 
 	public void addObject(GameObject gameObject) {
 		this.gameObjects.add(gameObject);
+		this.gameObjects.sort((GameObject a, GameObject b) -> {
+			return a.getZ() - b.getZ();
+		});
 	}
 
 	public void addEnemy(Enemy enemy) {
@@ -241,6 +251,10 @@ public class Game extends Menu {
 
 	public ArrayList<Enemy> getEnemies() {
 		return enemies;
+	}
+
+	public ArrayList<GameObject> getObjects() {
+		return gameObjects;
 	}
 
 	public double getWidth() {

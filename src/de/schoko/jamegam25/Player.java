@@ -13,6 +13,8 @@ public class Player extends GameObject {
 	private Context context;
 	private Game game;
 	private ImageFrame imageFrame;
+	// vx and vy are used for velocity
+	protected double vx, vy;
 	private int direction;
 	private double maxHealth;
 	private double health;
@@ -22,6 +24,8 @@ public class Player extends GameObject {
 	private double shootCooldown;
 	private double maxShootCooldown = 300;
 	private ArrayList<Integer> pressedKeys;
+	// Stunned is used for the time the player is stunned, usually 2000 ms (2 seconds)
+	protected double stunned;
 
 	public Player(Game game, Context context, double x, double y) {
 		super(x, y);
@@ -44,37 +48,51 @@ public class Player extends GameObject {
 
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
-		// Moving Part
+		// Movement Part
 		Keyboard keyboard = context.getKeyboard();
 
 		double oldX = x;
 		double oldY = y;
 
-		checkKey(Keyboard.A);
-		checkKey(Keyboard.LEFT);
-		checkKey(Keyboard.D);
-		checkKey(Keyboard.RIGHT);
-		checkKey(Keyboard.S);
-		checkKey(Keyboard.DOWN);
-		checkKey(Keyboard.W);
-		checkKey(Keyboard.UP);
-		int lastMovementKey = -1;
-		if (pressedKeys.size() > 0) {
-			lastMovementKey = pressedKeys.get(0);
+		if (stunned <= 0) {
+			checkKey(Keyboard.A);
+			checkKey(Keyboard.LEFT);
+			checkKey(Keyboard.D);
+			checkKey(Keyboard.RIGHT);
+			checkKey(Keyboard.S);
+			checkKey(Keyboard.DOWN);
+			checkKey(Keyboard.W);
+			checkKey(Keyboard.UP);
+			int lastMovementKey = -1;
+			if (pressedKeys.size() > 0) {
+				lastMovementKey = pressedKeys.get(0);
+			}
+			if (lastMovementKey == Keyboard.A || lastMovementKey == Keyboard.LEFT) {
+				direction = 3;
+				vx -= speed * deltaTimeMS / 1000;
+			} else if (lastMovementKey == Keyboard.D || lastMovementKey == Keyboard.RIGHT) {
+				direction = 2;
+				vx += speed * deltaTimeMS / 1000;
+			} else if (lastMovementKey == Keyboard.W || lastMovementKey == Keyboard.UP) {
+				direction = 0;
+				vy += speed * deltaTimeMS / 1000;
+			} else if (lastMovementKey == Keyboard.S || lastMovementKey == Keyboard.DOWN) {
+				direction = 1;
+				vy -= speed * deltaTimeMS / 1000;
+			}
 		}
-		if (lastMovementKey == Keyboard.A || lastMovementKey == Keyboard.LEFT) {
-			direction = 3;
-			x -= speed * deltaTimeMS / 1000;
-		} else if (lastMovementKey == Keyboard.D || lastMovementKey == Keyboard.RIGHT) {
-			direction = 2;
-			x += speed * deltaTimeMS / 1000;
-		} else if (lastMovementKey == Keyboard.W || lastMovementKey == Keyboard.UP) {
-			direction = 0;
-			y += speed * deltaTimeMS / 1000;
-		} else if (lastMovementKey == Keyboard.S || lastMovementKey == Keyboard.DOWN) {
-			direction = 1;
-			y -= speed * deltaTimeMS / 1000;
+
+		if (stunned <= 0) {
+        	this.vx *= 0.5;
+			this.vy *= 0.5;
+		} else {
+			this.vx *= 0.99;
+			this.vy *= 0.99;
+			this.stunned -= deltaTimeMS;
 		}
+
+		this.x += vx;
+		this.y += vy;
 
 		// Bounding box part
 
@@ -93,7 +111,7 @@ public class Player extends GameObject {
 			double a = mouse.getX() - this.x;
 			double b = mouse.getY() - this.y;
 			double direction = Math.atan2(b, a);
-			game.addObject(new Bullet(this.x, this.y, direction, this.damage, game.getEnemies()));
+			game.addObject(new Bullet(this.x, this.y, direction, this.damage, game));
 		} else if (shootCooldown > 0) {
 			shootCooldown -= deltaTimeMS;
 		}
