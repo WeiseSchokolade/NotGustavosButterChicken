@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import de.schoko.rendering.hud.BarDrawCall;
+import de.schoko.rendering.hud.CircleDrawCall;
 import de.schoko.rendering.hud.DrawCall;
 import de.schoko.rendering.hud.ImageDrawCall;
 import de.schoko.rendering.hud.RectDrawCall;
@@ -49,6 +50,10 @@ public class HUDGraph {
 	
 	public void drawImage(double x, double y, Image image, double scale) {
 		drawCalls.add(new ImageDrawCall(x, y, image, scale));
+	}
+	
+	public void drawCircle(double x, double y, double radius, Color color) {
+		drawCalls.add(new CircleDrawCall(x, y, radius, color));
 	}
 	
 	public double getWidth() {

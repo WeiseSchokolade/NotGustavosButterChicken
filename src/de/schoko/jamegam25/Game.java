@@ -2,6 +2,7 @@ package de.schoko.jamegam25;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Canvas;
 import java.util.ArrayList;
 
 import de.schoko.rendering.Camera;
@@ -12,12 +13,15 @@ import de.schoko.rendering.Graph;
 import de.schoko.rendering.HUDGraph;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
+import de.schoko.rendering.Keyboard;
+import de.schoko.rendering.Mouse;
 
 public class Game extends Menu {
 	public static final double MAX_WAVE_COOLDOWN = 10000;
 
 	private Player player;
 	private Tile[][] tiles;
+	private InventoryItem[] inventory;
 	private double width, height;
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Enemy> enemies;
@@ -31,6 +35,7 @@ public class Game extends Menu {
 		this.gameObjects = new ArrayList<>();
 		this.enemies = new ArrayList<>();
 		this.tiles = new Tile[20][10];
+		this.inventory = new InventoryItem[4];
 		width = tiles.length;
 		height = tiles[0].length;
 
@@ -42,6 +47,24 @@ public class Game extends Menu {
 		imagePool.addImage("playerDown", basePath + "playerDown.png", ImageLocation.JAR);
 		imagePool.addImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.addImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
+		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
+		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
+		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
+		imagePool.addImage("sprite", basePath + "sprite.png", ImageLocation.JAR);
+		
+		// Item Setup Part
+		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 3, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
+			// TODO: Heal player
+		});
+		inventory[1] = new InventoryItem(imagePool.getImage("chilli"), 3, "Chlli", "Makes you faster", Keyboard.TWO, (Player player) -> {
+			// TODO: Make player faster			
+		});
+		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 3, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
+			// TODO: Heal player over time
+		});
+		inventory[3] = new InventoryItem(imagePool.getImage("sprite"), 3, "Sprite", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
+			// TODO: Make player stronger
+		});
 
 		// Visual Stuff
 		context.getCamera().setCameraPath(new CameraPath() {
@@ -54,19 +77,21 @@ public class Game extends Menu {
 		});
 		context.getSettings().setBackgroundColor(0, 20, 200);
 		
-
 		// Object Creation
 		player = new Player(this, context, 0, 0);
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				tiles[x][y] = new Tile(x - width / 2 + 0.5, y - height / 2 + 0.5, imagePool.getImage("tile"), 16);
-			}			
+			}
 		}
 	}
 
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
+		HUDGraph hud = g.getHUD();
+		Keyboard keyboard = getContext().getKeyboard();
+		Mouse mouse = getContext().getMouse();
 
 		// Wave Part
 		if (waveCooldown > 0) {
@@ -82,12 +107,51 @@ public class Game extends Menu {
 				if (enemies.size() == 0) {
 					waveCooldown = MAX_WAVE_COOLDOWN;
 					wave++;
-					
 				}
 			} else {
 				// Spawn new enemies
 				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05) + wave + 1;
 				spawn(waveEnemyAmount);
+			}
+		}
+
+		// Inventory Part
+		if (getContext().getKeyboard().isPressed(Keyboard.TAB)) {
+			double extraSpacing = 25;
+			double textureScale = 0.5;
+			final double itemTextureSize = 16 / textureScale;
+
+			double inventoryWidth = 200;
+			double inventoryHeight = 100;
+			
+			hud.drawRect(hud.getWidth() / 2 - inventoryWidth / 2, 10, inventoryWidth, inventoryHeight, Graph.getColor(127, 127, 127, 200));
+			double baseX = hud.getWidth() / 2 - inventoryWidth / 2 + extraSpacing;
+			double baseY = 10 + extraSpacing;
+			Font font = new Font("Segoe UI", Font.PLAIN, 15);
+			for (int i = 0; i < inventory.length; i++) {
+				InventoryItem item = inventory[i];
+				double drawX = baseX + ((double) i / inventory.length) * (inventoryWidth - extraSpacing);
+				hud.drawText("" + (i + 1), drawX + 10, baseY - 10, Color.BLACK, font);
+				hud.drawImage(drawX, baseY, item.getImage(), textureScale);
+				if (keyboard.wasRecentlyPressed(item.getKey())) {
+					
+				}
+			}
+			for (int i = 0; i < inventory.length; i++) {
+				InventoryItem item = inventory[i];
+				double drawX = baseX + ((double) i / inventory.length) * (inventoryWidth - extraSpacing);
+				if (mouse.getScreenX() > drawX + extraSpacing / 2 - itemTextureSize / 2 && mouse.getScreenX() < drawX + extraSpacing / 2 + itemTextureSize / 2) {
+					if (mouse.getScreenY() > baseY && mouse.getScreenY() < baseY + itemTextureSize) {
+						Canvas canvas = new Canvas();
+						final int margin = 2;
+						double nameWidth = canvas.getFontMetrics(font).stringWidth(item.getName());
+						double descriptionWidth = canvas.getFontMetrics(font).stringWidth(item.getDescription());
+						double width = (nameWidth > descriptionWidth) ? nameWidth : descriptionWidth;
+						hud.drawRect(mouse.getScreenX(), mouse.getScreenY() - 13, width + 2 * 2, 15 * 2 + margin + margin * 2, Color.WHITE);
+						hud.drawText(item.getName(), mouse.getScreenX() + margin, mouse.getScreenY() + margin, Color.BLACK, font);
+						hud.drawText(item.getDescription(), mouse.getScreenX() + margin, mouse.getScreenY() + margin * 2 + 15, Color.BLACK, font);
+					}
+				}
 			}
 		}
 
@@ -117,16 +181,15 @@ public class Game extends Menu {
 		});
 
 		// HUD Rendering Part
-		HUDGraph hud = g.getHUD();
 		hud.drawText("Wave: " + wave, 5, 25, Color.RED, new Font("Segoe UI", Font.BOLD, 25));
 		
+		// Wave Bar Part
 		double perc = enemies.size() / waveEnemyAmount;
 		String title = "Enemies: " + enemies.size() + " / " + waveEnemyAmount;
 		if (waveCooldown > 0) {
 			perc = (MAX_WAVE_COOLDOWN - waveCooldown) / MAX_WAVE_COOLDOWN;
 			title = "Building Wave " + wave;
 		}
-
 		hud.drawBar(5, 38.5, 100, 15, perc, Graph.getColor(177, 0, 150), Graph.getColor(127, 0, 100));
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
 	}
@@ -143,7 +206,7 @@ public class Game extends Menu {
 				// Spawn at bottom
 				y = - height / 2 - 2;
 			}
-			addEnemy(new Enemy(player, x, y));
+			addEnemy(new Enemy(this, player, x, y));
 		}
 	}
 
@@ -155,7 +218,23 @@ public class Game extends Menu {
 		this.enemies.add(enemy);
 	}
 
+	public Tile getTile(double x, double y) {
+		return tiles[(int) (Math.floor(x))][(int) (Math.floor(y))];
+	}
+
 	public ArrayList<Enemy> getEnemies() {
 		return enemies;
+	}
+
+	public double getWidth() {
+		return width;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
+	public InventoryItem[] getInventory() {
+		return inventory;
 	}
 }

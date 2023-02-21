@@ -1,18 +1,17 @@
 package de.schoko.jamegam25;
 
 import de.schoko.rendering.Graph;
-import de.schoko.rendering.Image;
 import de.schoko.rendering.shapes.ImageFrame;
 
 public class Item extends GameObject {
-	private int type;
+	private InventoryItem inventoryItem;
 	private double t;
 	private ImageFrame imageFrame;
 
-	public Item(double x, double y, int type, Image image, double scale) {
+	public Item(double x, double y, InventoryItem inventoryItem) {
 		super(x, y);
-		this.type = type;
-		this.imageFrame = new ImageFrame(x, y, image, scale);
+		this.imageFrame = new ImageFrame(x, y, inventoryItem.getImage(), 16 * 2);
+		t += Math.random() * 2 * Math.PI;
 	}
 
 	@Override
@@ -21,9 +20,14 @@ public class Item extends GameObject {
 
 		this.imageFrame.setX(this.getX());
 		this.imageFrame.setY(this.getY() + Math.cos(t) * 0.05);
+		g.draw(imageFrame);
 	}
 
-	public int getType() {
-		return type;
+	public void use(Player player) {
+		inventoryItem.use(player);
+	}
+
+	public InventoryItem getType() {
+		return inventoryItem;
 	}
 }
