@@ -49,8 +49,7 @@ public class Player extends GameObject {
 	@Override
 	public void render(Graph g, double deltaTimeMS) {
 		// Movement Part
-		Keyboard keyboard = context.getKeyboard();
-
+		
 		double oldX = x;
 		double oldY = y;
 
