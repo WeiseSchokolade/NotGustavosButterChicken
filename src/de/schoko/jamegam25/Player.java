@@ -14,6 +14,7 @@ public class Player extends GameObject {
 	private Game game;
 	private ImageFrame imageFrame;
 	private int direction;
+	private double maxHealth;
 	private double health;
 	private double damage;
 	private Image[] images;
@@ -27,7 +28,8 @@ public class Player extends GameObject {
 		this.context = context;
 		this.game = game;
 		this.speed = 4;
-		this.health = 3;
+		this.maxHealth = 3;
+		this.health = maxHealth;
 		this.damage = 1;
 		images = new Image[4];
 		images[0] = context.getImagePool().getImage("playerUp");
@@ -121,11 +123,30 @@ public class Player extends GameObject {
 		this.health = health;
 	}
 
+	public double getMaxHealth() {
+		return maxHealth;
+	}
+
+	public void setMaxHealth(double maxHealth) {
+		this.maxHealth = maxHealth;
+		if (this.maxHealth < health) {
+			this.health = maxHealth;
+		}
+	}
+
 	public double getDamage() {
 		return damage;
 	}
 
 	public void setDamage(double damage) {
 		this.damage = damage;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 }

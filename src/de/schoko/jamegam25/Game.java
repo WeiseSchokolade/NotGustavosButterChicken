@@ -50,20 +50,20 @@ public class Game extends Menu {
 		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
 		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
 		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
-		imagePool.addImage("sprite", basePath + "sprite.png", ImageLocation.JAR);
+		imagePool.addImage("soda", basePath + "soda.png", ImageLocation.JAR);
 		
 		// Item Setup Part
-		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 3, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
-			// TODO: Heal player
+		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
+			player.setMaxHealth(player.getMaxHealth() + 1);
 		});
-		inventory[1] = new InventoryItem(imagePool.getImage("chilli"), 3, "Chlli", "Makes you faster", Keyboard.TWO, (Player player) -> {
-			// TODO: Make player faster			
+		inventory[1] = new InventoryItem(imagePool.getImage("chilli"), 0, "Chilli", "Makes you faster", Keyboard.TWO, (Player player) -> {
+			player.setSpeed(player.getSpeed() + 0.5);
 		});
-		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 3, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
+		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 0, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
 			// TODO: Heal player over time
 		});
-		inventory[3] = new InventoryItem(imagePool.getImage("sprite"), 3, "Sprite", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
-			// TODO: Make player stronger
+		inventory[3] = new InventoryItem(imagePool.getImage("soda"), 0, "Soda", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
+			player.setDamage(player.getDamage() + 0.5);
 		});
 
 		// Visual Stuff
@@ -110,7 +110,7 @@ public class Game extends Menu {
 				}
 			} else {
 				// Spawn new enemies
-				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05) + wave + 1;
+				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05 + wave * Math.random() + 1);
 				spawn(waveEnemyAmount);
 			}
 		}
@@ -128,13 +128,21 @@ public class Game extends Menu {
 			double baseX = hud.getWidth() / 2 - inventoryWidth / 2 + extraSpacing;
 			double baseY = 10 + extraSpacing;
 			Font font = new Font("Segoe UI", Font.PLAIN, 15);
+			hud.drawText("Key: ", baseX - extraSpacing + 2, baseY - 10, Color.BLACK, font);
 			for (int i = 0; i < inventory.length; i++) {
 				InventoryItem item = inventory[i];
 				double drawX = baseX + ((double) i / inventory.length) * (inventoryWidth - extraSpacing);
-				hud.drawText("" + (i + 1), drawX + 10, baseY - 10, Color.BLACK, font);
+				hud.drawText("" + (i + 1), drawX + 10, baseY - 10, Color.WHITE, font);
 				hud.drawImage(drawX, baseY, item.getImage(), textureScale);
+				Color color = Color.WHITE;
+				if (item.getAmount() == 0) {
+					color = Color.RED;
+				} else if (item.getAmount() == 1) {
+					color = Color.YELLOW;
+				}
+				hud.drawText("  " + item.getAmount(), drawX + 10, baseY + 30, color, font);
 				if (keyboard.wasRecentlyPressed(item.getKey())) {
-					
+					item.use(player);
 				}
 			}
 			for (int i = 0; i < inventory.length; i++) {
@@ -144,15 +152,22 @@ public class Game extends Menu {
 					if (mouse.getScreenY() > baseY && mouse.getScreenY() < baseY + itemTextureSize) {
 						Canvas canvas = new Canvas();
 						final int margin = 2;
-						double nameWidth = canvas.getFontMetrics(font).stringWidth(item.getName());
+						String text1 = "" + item.getAmount() + " x " + item.getName();
+						double nameWidth = canvas.getFontMetrics(font).stringWidth(text1);
 						double descriptionWidth = canvas.getFontMetrics(font).stringWidth(item.getDescription());
 						double width = (nameWidth > descriptionWidth) ? nameWidth : descriptionWidth;
 						hud.drawRect(mouse.getScreenX(), mouse.getScreenY() - 13, width + 2 * 2, 15 * 2 + margin + margin * 2, Color.WHITE);
-						hud.drawText(item.getName(), mouse.getScreenX() + margin, mouse.getScreenY() + margin, Color.BLACK, font);
+						hud.drawText(text1, mouse.getScreenX() + margin, mouse.getScreenY() + margin, Color.BLACK, font);
 						hud.drawText(item.getDescription(), mouse.getScreenX() + margin, mouse.getScreenY() + margin * 2 + 15, Color.BLACK, font);
 					}
 				}
 			}
+		} else {
+			String text = "Press TAB to view inventory";
+			Font font = new Font("Segoe UI", Font.PLAIN, 15);
+			Canvas canvas = new Canvas();
+			double textWidth = canvas.getFontMetrics(font).stringWidth(text);
+			hud.drawText(text, hud.getWidth() / 2 - textWidth / 2, 25, Color.WHITE, font);
 		}
 
 		// Rendering Part
@@ -192,6 +207,8 @@ public class Game extends Menu {
 		}
 		hud.drawBar(5, 38.5, 100, 15, perc, Graph.getColor(177, 0, 150), Graph.getColor(127, 0, 100));
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
+		hud.drawBar(5, 60, 100, 15, player.getHealth() / player.getMaxHealth(), Graph.getColor(255, 0, 0), Graph.getColor(200, 0, 0));
+		hud.drawText("Health: " + (int) (Math.round(player.getHealth())) + " / " + (int) (Math.round(player.getMaxHealth())), 10, 71.5, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
 	}
 
 	public void spawn(int max) {
@@ -236,5 +253,9 @@ public class Game extends Menu {
 
 	public InventoryItem[] getInventory() {
 		return inventory;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

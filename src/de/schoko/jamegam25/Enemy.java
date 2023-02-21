@@ -48,9 +48,11 @@ public class Enemy extends GameObject {
 		super.remove();
 		InventoryItem[] inventory = game.getInventory();
 
-		for (int i = 0; i < Math.random() * 4; i++) {
+		double maxPossibleItemAmount = 4;
+		double itemAmount = Math.random() * maxPossibleItemAmount * 2 - maxPossibleItemAmount;
+		for (int i = 0; i < Math.random() * itemAmount; i++) {
 			InventoryItem item = inventory[(int) (Math.random() * inventory.length)];
-			game.addObject(new Item(x + (Math.random() - 0.5), y + (Math.random() - 0.5), item));
+			game.addObject(new Item(game.getPlayer(), x + (Math.random() - 0.5), y + (Math.random() - 0.5), item));
 		}
 	}
 }

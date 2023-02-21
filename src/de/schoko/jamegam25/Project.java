@@ -26,6 +26,9 @@ public class Project extends Renderer {
 	}
 
 	public void setMenu(Menu menu) {
+		if (this.menu != null) {
+			this.menu.onLeave(getContext());
+		}
 		this.menu = menu;
 		this.menu.setContext(getContext());
 		this.menu.setProject(this);
