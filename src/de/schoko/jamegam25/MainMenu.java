@@ -51,13 +51,20 @@ public class MainMenu extends Menu {
 			if (mouse.getY() <= -0.125 && mouse.getY() >= -0.375) {
 				g.drawString("Play", -0.5, -0.25, Color.BLACK, font.deriveFont(30.0f));
 				if  (mouse.isPressed(Mouse.LEFT_BUTTON)) {
-					getProject().setMenu(new Game());
+					getProject().setMenu(new IntroMenu());
 				}
 			} else {
 				g.drawString("Play", -0.5, -0.25, Color.BLACK, font);
 			}
 		} else {
 			g.drawString("Play", -0.5, -0.25, Color.BLACK, font);
+		}
+	}
+
+	@Override
+	public void onLeave(Context context) {
+		if (sound != null) {
+			sound.stop();
 		}
 	}
 }
