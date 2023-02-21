@@ -1,6 +1,7 @@
 package de.schoko.rendering;
 
 import java.awt.BasicStroke;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -60,6 +61,25 @@ public class Graph {
 	
 	public static Color getColor(int r, int g, int b, int a) {
 		return new Color(r, g, b, a);
+	}
+	
+	/**
+	 * @param text The string to be measured
+	 * @param font The font this text is to be written in
+	 * @return The width of the entered string in pixels
+	 */
+	public static int getStringWidth(String text, Font font) {
+		Canvas canvas = new Canvas();
+		return canvas.getFontMetrics(font).stringWidth(text);
+	}
+	
+	/**
+	 * This method cannot be static because it uses the underlying {@link Graphics2D#getFontMetrics()} method
+	 * @param text The string to be measured
+	 * @return The width of the entered string in pixels
+	 */
+	public int getStringWidth(String text) {
+		return g2D.getFontMetrics(g2D.getFont()).stringWidth(text);
 	}
 	
 	public void finalize() {
