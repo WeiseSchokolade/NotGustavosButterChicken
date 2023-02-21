@@ -11,12 +11,14 @@ public class Bullet extends GameObject{
 	private ArrayList<Enemy> enemies;
 	private double direction;
 	private double speed;
+	private double damage;
 
-	public Bullet(double x, double y, double direction, ArrayList<Enemy> enemies) {
+	public Bullet(double x, double y, double direction, double damage, ArrayList<Enemy> enemies) {
 		super(x, y);
 		this.direction = direction;
 		this.speed = 7;
 		this.enemies = enemies;
+		this.damage = damage;
 	}
 
 	@Override
@@ -27,7 +29,7 @@ public class Bullet extends GameObject{
 		for (int i = 0; i < enemies.size(); i++) {
 			Enemy enemy = enemies.get(i);
 			if (distanceTo(enemy) < 0.5) {
-				enemy.remove();
+				enemy.applyDamage(this.damage);
 				this.remove();
 			}
 		}
