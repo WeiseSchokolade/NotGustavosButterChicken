@@ -35,7 +35,7 @@ public class Game extends Menu {
 	private Boss bossFight;
 
 	public Game() {
-		super(false);
+		super(true);
 	}
 
 	@Override
