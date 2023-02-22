@@ -8,7 +8,8 @@ public class TestBossFight extends Boss {
 
 	public TestBossFight(Game game) {
 		super("TEST");
-		t = 5000;
+		t = 50000;
+		this.game = game;
 	}
 
 	@Override
@@ -16,9 +17,15 @@ public class TestBossFight extends Boss {
 		t -= deltaTimeMS;
 
 		g.drawString("Bossfight not ready", 0, 0);
-		g.drawString("" + t + " / 5000", 0, -0.5);
+		g.drawString("" + t + " / 50000", 0, -0.5);
 
-		setProgress(t / 5000);
+		g.drawImage(game.getContext().getImagePool().getImage("antagonist").getAWTImage(), game.getWidth() / 2 + 2, 0.0, 16.0);
+
+		if (Math.random() > 0.99) {
+			game.addObject(new Barrel(game.getWidth() / 2 + 2, Math.random() * game.getHeight() - game.getHeight() / 2, game));
+		}
+
+		setProgress(t / 50000);
 		if (t <= 0) {
 			setCompleted(true);
 		}

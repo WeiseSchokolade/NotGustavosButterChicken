@@ -6,6 +6,11 @@ import de.schoko.rendering.Graph;
 public abstract class Menu {
 	private Context context;
 	private Project project;
+	private boolean pausable;
+
+	public Menu(boolean isPausable) {
+		this.pausable = isPausable;
+	}
 
 	public void onLoad(Context context) {
 
@@ -31,5 +36,9 @@ public abstract class Menu {
 
 	protected void setContext(Context context) {
 		this.context = context;
+	}
+
+	public boolean isPausable() {
+		return pausable;
 	}
 }

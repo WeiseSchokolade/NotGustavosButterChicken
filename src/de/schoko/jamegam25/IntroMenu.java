@@ -20,6 +20,10 @@ public class IntroMenu extends Menu {
 	private Scene currentScene;
 	private double spacePressCooldown;
 	
+	public IntroMenu() {
+		super(true);
+	}
+
 	@Override
 	public void onLoad(Context context) {
 		// Array instanciation

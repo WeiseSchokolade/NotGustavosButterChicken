@@ -18,6 +18,10 @@ import de.schoko.rendering.Mouse;
 public class MainMenu extends Menu {
 	private Sound sound;
 
+	public MainMenu() {
+		super(false);
+	}
+
 	@Override
 	public void onLoad(Context context) {
 		context.getSettings().setBackgroundColor(78, 188, 208);

@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Canvas;
 import java.util.ArrayList;
 
+import de.schoko.jamegam25.shapes.AnimatedImage;
+import de.schoko.jamegam25.shapes.AnimatedImageFrame;
 import de.schoko.rendering.Camera;
 import de.schoko.rendering.CameraPath;
 import de.schoko.rendering.CameraPathPoint;
@@ -23,7 +25,7 @@ public class Game extends Menu {
 	private Player player;
 	private Tile[][] tiles;
 	private InventoryItem[] inventory;
-	private double width, height;
+	private int width, height;
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Enemy> enemies;
 	private int waveEnemyAmount;
@@ -32,25 +34,38 @@ public class Game extends Menu {
 	private double waveCooldown;
 	private Boss bossFight;
 
+	public Game() {
+		super(false);
+	}
+
 	@Override
 	public void onLoad(Context context) {
 		// Array Instanciation
 		this.gameObjects = new ArrayList<>();
 		this.enemies = new ArrayList<>();
-		this.tiles = new Tile[20][10];
+		width = 20;
+		height = 10;
+		this.tiles = new Tile[width + 2 + 2][height + 2 + 8];
 		this.inventory = new InventoryItem[4];
-		width = tiles.length - 2;
-		height = tiles[0].length - 2;
 		wave = 1;
 
 		// Loading Stuff
 		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
 		imagePool.addImage("tile", basePath + "tile.png", ImageLocation.JAR);
+		imagePool.addImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
+		imagePool.addImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
+		imagePool.addImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
+		imagePool.addImage("wallWater0", basePath + "wallWater_0.png", ImageLocation.JAR);
+		imagePool.addImage("wallWater1", basePath + "wallWater_1.png", ImageLocation.JAR);
+		imagePool.addImage("wallWater2", basePath + "wallWater_2.png", ImageLocation.JAR);
+		imagePool.addImage("wallBullseye", basePath + "wallBullseye.png", ImageLocation.JAR);
+		imagePool.addImage("wallCannon", basePath + "wallCannon.png", ImageLocation.JAR);
 		imagePool.addImage("playerUp", basePath + "playerUp.png", ImageLocation.JAR);
 		imagePool.addImage("playerDown", basePath + "playerDown.png", ImageLocation.JAR);
 		imagePool.addImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.addImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
+		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
 		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
 		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
 		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
@@ -87,14 +102,37 @@ public class Game extends Menu {
 				return new CameraPathPoint(player.getX(), player.getY() + Math.sin(t) * 0.25, 60);
 			}
 		});
-		context.getSettings().setBackgroundColor(0, 20, 200);
+		context.getSettings().setBackgroundColor(55, 129, 244);
 		
 		// Object Creation
 		player = new Player(this, context, 0, 0);
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage("tile"), 16);
+				String img = "tile";
+				if (y == 0) {
+					AnimatedImageFrame animatedImageFrame = new AnimatedImageFrame(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5,
+						16, new AnimatedImage(imagePool.getImage("wallWater0"), 500),
+						new AnimatedImage(imagePool.getImage("wallWater1"), 500),
+						new AnimatedImage(imagePool.getImage("wallWater2"), 500));
+					tiles[x][y] = new Tile(animatedImageFrame);
+					continue;
+				} else if (y == 2 &&
+					      ((x) % 6 == 0)) {
+					img = "wallBullseye";
+				} else if (y == 2 &&
+						  ((x + 3) % 6 == 0)) {
+		  			img = "wallCannon";
+	  			} else if (y < 3) {
+					img = "wallTileFront";
+				} else if (y == 3) {
+					img = "wallTopFront";
+				} else if (y >= tiles[x].length - 3) {
+					continue;
+				} else if (y == tiles[x].length - 4) {
+					img = "wallTopBack";
+				}
+				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage(img), 16);
 			}
 		}
 	}
@@ -148,6 +186,9 @@ public class Game extends Menu {
 		}
 		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
 		
+		this.gameObjects.sort((GameObject a, GameObject b) -> {
+			return a.getZ() - b.getZ();
+		});
 		for (int i = 0; i < gameObjects.size(); i++) {
 			gameObjects.get(i).render(g, deltaTimeMS);
 		}
@@ -260,9 +301,6 @@ public class Game extends Menu {
 
 	public void addObject(GameObject gameObject) {
 		this.gameObjects.add(gameObject);
-		this.gameObjects.sort((GameObject a, GameObject b) -> {
-			return a.getZ() - b.getZ();
-		});
 	}
 
 	public void addEnemy(Enemy enemy) {
