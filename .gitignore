@@ -5,6 +5,11 @@ build/
 out/
 classes/
 
+# maven
+
+target/
+pom.xml
+
 # eclipse
 
 *.launch
