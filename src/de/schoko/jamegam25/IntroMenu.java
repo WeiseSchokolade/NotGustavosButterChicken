@@ -26,7 +26,7 @@ public class IntroMenu extends Menu {
 		scenes = new ArrayList<>();
 
 		// Asset Loading
-		String basePath = "de/schoko/jamegam25/assets/";
+		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
 		imagePool.addImage("pirate", basePath + "pirate.png", ImageLocation.JAR);
 		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);

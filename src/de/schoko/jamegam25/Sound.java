@@ -1,5 +1,6 @@
 package de.schoko.jamegam25;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -20,7 +21,7 @@ public class Sound {
 	 */
 	public Sound(String path) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
 		clip = AudioSystem.getClip();
-		InputStream stream = Sound.class.getClassLoader().getResourceAsStream(path);
+		InputStream stream = new BufferedInputStream(Sound.class.getClassLoader().getResourceAsStream(path));
 		AudioInputStream inputStream = AudioSystem.getAudioInputStream(stream);
 		clip.open(inputStream);
 	}

@@ -21,7 +21,6 @@ public class Puddle extends GameObject {
 		if (stage < 4) {
 			updateImage();
 			g.draw(drawing);
-			g.drawString("Stage: " + stage, x, y);
 		} else {
 			remove();
 		}

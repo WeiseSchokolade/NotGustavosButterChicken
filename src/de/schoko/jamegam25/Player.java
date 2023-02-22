@@ -8,6 +8,7 @@ import de.schoko.rendering.Image;
 import de.schoko.rendering.Keyboard;
 import de.schoko.rendering.Mouse;
 import de.schoko.rendering.shapes.ImageFrame;
+import de.schoko.rendering.shapes.Rectangle;
 
 public class Player extends GameObject {
 	private Context context;
@@ -23,6 +24,8 @@ public class Player extends GameObject {
 	private double speed;
 	private double shootCooldown;
 	private double maxShootCooldown = 300;
+	private double damaged;
+	private ArrayList<Long> heals;
 	private ArrayList<Integer> pressedKeys;
 	// Stunned is used for the time the player is stunned, usually 2000 ms (2 seconds)
 	protected double stunned;
@@ -43,6 +46,7 @@ public class Player extends GameObject {
 
 		imageFrame = new ImageFrame(x, y, images[direction], 16);
 
+		heals = new ArrayList<>();
 		pressedKeys = new ArrayList<>();
 	}
 
@@ -102,6 +106,37 @@ public class Player extends GameObject {
 			y = oldY;
 		}
 
+		// Damage by puddles
+		ArrayList<GameObject> objects = game.getObjects();
+		for (int i = 0; i < objects.size(); i++) {
+			GameObject gameObject = objects.get(i);
+			if (gameObject instanceof Puddle) {
+				Puddle puddle = (Puddle) gameObject;
+				if (puddle.x > this.x - 0.5 && puddle.x < this.x + 0.5 && puddle.y > this.y - 0.5 && puddle.y < this.y + 0.5) {
+					puddle.setStage(puddle.getStage() + deltaTimeMS / 1000);
+					applyDamage(deltaTimeMS / 1000);
+					break;
+				}
+			}
+		}
+
+		// Healing Part 3000 = 3 Seconds of Healing
+		// Removes all healing times if they're older than 3 seconds
+		if (heals.size() > 0) {
+			for (int i = 0; i < heals.size(); i++) {
+				if (heals.get(i) + 3000 < System.currentTimeMillis()) {
+					heals.remove(i);
+				} else {
+					// There aren't any heals older than this one 
+					break;
+				}
+			}
+			this.health += deltaTimeMS / 1000 * heals.size();
+			if (this.health > maxHealth) {
+				this.health = maxHealth;
+			}
+		}
+
 
 		// Shooting Part
 		Mouse mouse = context.getMouse();
@@ -120,6 +155,11 @@ public class Player extends GameObject {
 		imageFrame.setY(this.y);
 		imageFrame.setImage(images[direction]);
 		g.draw(imageFrame);
+
+		if (damaged > 0) {
+			// TODO: Damage Visual
+			damaged -= deltaTimeMS;
+		}
 	}
 
 	public void checkKey(int key) {
@@ -129,6 +169,14 @@ public class Player extends GameObject {
 		}
 		if (!keyboard.isPressed(key) && pressedKeys.contains(key)) {
 			pressedKeys.remove((Integer) key);
+		}
+	}
+
+	public void applyDamage(double damage) {
+		this.health -= damage;
+		damaged = 200;
+		if (this.health <= 0) {
+			// TODO: Game Over
 		}
 	}
 	
@@ -149,6 +197,10 @@ public class Player extends GameObject {
 		if (this.maxHealth < health) {
 			this.health = maxHealth;
 		}
+	}
+
+	public void addHeal() {
+		this.heals.add((Long) System.currentTimeMillis());
 	}
 
 	public double getDamage() {

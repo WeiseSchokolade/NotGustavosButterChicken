@@ -18,6 +18,7 @@ import de.schoko.rendering.Mouse;
 
 public class Game extends Menu {
 	public static final double MAX_WAVE_COOLDOWN = 10000;
+	public static final int BOSS_FREQUENCY = 5; // Boss every 5 waves
 
 	private Player player;
 	private Tile[][] tiles;
@@ -26,8 +27,10 @@ public class Game extends Menu {
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Enemy> enemies;
 	private int waveEnemyAmount;
+	private int enemyLevel;
 	private int wave;
 	private double waveCooldown;
+	private Boss bossFight;
 
 	@Override
 	public void onLoad(Context context) {
@@ -38,9 +41,10 @@ public class Game extends Menu {
 		this.inventory = new InventoryItem[4];
 		width = tiles.length - 2;
 		height = tiles[0].length - 2;
+		wave = 1;
 
 		// Loading Stuff
-		String basePath = "de/schoko/jamegam25/assets/";
+		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
 		imagePool.addImage("tile", basePath + "tile.png", ImageLocation.JAR);
 		imagePool.addImage("playerUp", basePath + "playerUp.png", ImageLocation.JAR);
@@ -57,6 +61,8 @@ public class Game extends Menu {
 		imagePool.addImage("puddle_s1", basePath + "puddle_s1.png", ImageLocation.JAR);
 		imagePool.addImage("puddle_s2", basePath + "puddle_s2.png", ImageLocation.JAR);
 		imagePool.addImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
+		imagePool.addImage("barrel_s0", basePath + "barrel_s0.png", ImageLocation.JAR);
+		imagePool.addImage("barrel_s1", basePath + "barrel_s1.png", ImageLocation.JAR);
 		
 		// Item Setup Part
 		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
@@ -66,7 +72,7 @@ public class Game extends Menu {
 			player.setSpeed(player.getSpeed() + 0.5);
 		});
 		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 0, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
-			// TODO: Heal player over time
+			player.addHeal();
 		});
 		inventory[3] = new InventoryItem(imagePool.getImage("soda"), 0, "Soda", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
 			player.setDamage(player.getDamage() + 0.5);
@@ -100,24 +106,35 @@ public class Game extends Menu {
 		Mouse mouse = getContext().getMouse();
 
 		// Wave Part
-		if (waveCooldown > 0) {
-			waveCooldown -= deltaTimeMS;
-		} else {
-			if (enemies.size() > 0) {
-				// There are already enemies
-
-				enemies.removeIf((Enemy enemy) -> {
-					return enemy.isRemoved();
-				});
-
-				if (enemies.size() == 0) {
-					waveCooldown = MAX_WAVE_COOLDOWN;
-					wave++;
-				}
+		if (wave % BOSS_FREQUENCY != 0) {
+			if (waveCooldown > 0) {
+				waveCooldown -= deltaTimeMS;
 			} else {
-				// Spawn new enemies
-				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05 + wave * Math.random() + 1);
-				spawn(waveEnemyAmount);
+				if (enemies.size() > 0) {
+					// There are already enemies
+
+					enemies.removeIf((Enemy enemy) -> {
+						return enemy.isRemoved();
+					});
+
+					if (enemies.size() == 0) {
+						waveCooldown = MAX_WAVE_COOLDOWN;
+						enemyLevel++;
+						wave++;
+						if (wave % BOSS_FREQUENCY == 0) {
+							bossFight = Boss.getRandom(this);
+						}
+					}
+				} else {
+					// Spawn new enemies
+					waveEnemyAmount = (int) Math.round((enemyLevel * enemyLevel) * 0.05 + enemyLevel * Math.random() + 1);
+					spawn(waveEnemyAmount);
+				}
+			}
+		} else {
+			if (bossFight.isCompleted()) {
+				wave++;
+				bossFight = null;
 			}
 		}
 
@@ -131,13 +148,16 @@ public class Game extends Menu {
 		}
 		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
 		
-
 		for (int i = 0; i < gameObjects.size(); i++) {
 			gameObjects.get(i).render(g, deltaTimeMS);
 		}
 		
 		for (int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).render(g, deltaTimeMS);
+		}
+
+		if (bossFight != null) {
+			bossFight.render(g, deltaTimeMS);
 		}
 
 		player.render(g, deltaTimeMS);
@@ -211,6 +231,10 @@ public class Game extends Menu {
 		if (waveCooldown > 0) {
 			perc = (MAX_WAVE_COOLDOWN - waveCooldown) / MAX_WAVE_COOLDOWN;
 			title = "Building Wave " + wave;
+		}
+		if (bossFight != null) {
+			// Boss wave
+			title = bossFight.getName();
 		}
 		hud.drawBar(5, 38.5, 100, 15, perc, Graph.getColor(177, 0, 150), Graph.getColor(127, 0, 100));
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));

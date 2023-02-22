@@ -50,7 +50,7 @@ public class Enemy extends GameObject {
 			g.drawString("Hitbox", x, y);
 			this.stunned = 2000;
 			player.stunned = 1000;
-			player.setHealth(player.getHealth() - 1);
+			player.applyDamage(1);
 		}
 
 		// Movement apply

@@ -23,7 +23,7 @@ public class MainMenu extends Menu {
 		context.getSettings().setBackgroundColor(78, 188, 208);
 
 		try {
-			sound = new Sound("de/schoko/jamegam25/assets/sound.wav");
+			sound = new Sound(Project.ASSET_PATH + "sound.wav");
 			sound.start();
 		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
 			e.printStackTrace();

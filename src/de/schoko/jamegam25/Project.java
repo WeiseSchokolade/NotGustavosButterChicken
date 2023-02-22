@@ -6,6 +6,8 @@ import de.schoko.rendering.Renderer;
 import de.schoko.rendering.Window;
 
 public class Project extends Renderer {
+	public static final String ASSET_PATH = "de/schoko/jamegam25/assets/";
+
 	public static void main(String[] args) {
 		Window window = new Window(new Project(), "Jame Gam 25");
 		window.getSettings().setRenderCoordinateSystem(false);

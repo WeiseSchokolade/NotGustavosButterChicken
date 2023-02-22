@@ -18,6 +18,17 @@ public class AnimatedImageFrame extends Shape {
 		this.images = images;
 		this.scale = scale;
 	}
+
+	public AnimatedImageFrame(double x, double y, double scale, AnimatedImage image, AnimatedImage... images) {
+		this.x = x;
+		this.y = y;
+		this.images = new ArrayList<>();
+		this.scale = scale;
+		this.images.add(image);
+		for (int i = 0; i < images.length; i++) {
+			this.images.add(images[i]);
+		}
+	}
 	
 	@Override
 	public void render(Graph g) {
