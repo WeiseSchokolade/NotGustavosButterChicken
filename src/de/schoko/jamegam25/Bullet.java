@@ -14,6 +14,7 @@ public class Bullet extends GameObject{
 	private double speed;
 	private double damage;
 	private double height;
+	private double dHeight; // change of height
 
 	public Bullet(double x, double y, double direction, double damage, Game game) {
 		super(x, y);
@@ -24,7 +25,8 @@ public class Bullet extends GameObject{
 		this.direction = direction;
 		this.speed = 9;
 		this.damage = damage;
-		this.height = 1;
+		this.height = 0.25;
+		this.dHeight = 0.25;
 	}
 
 	@Override
@@ -49,7 +51,8 @@ public class Bullet extends GameObject{
 			}
 		}
 
-		this.height -= deltaTimeMS / 1000;
+		this.dHeight -= deltaTimeMS / 1000;
+		this.height += this.dHeight / 10;
 
 		if (this.height <= 0) {
 			// Destory

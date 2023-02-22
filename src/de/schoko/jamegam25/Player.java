@@ -8,7 +8,6 @@ import de.schoko.rendering.Image;
 import de.schoko.rendering.Keyboard;
 import de.schoko.rendering.Mouse;
 import de.schoko.rendering.shapes.ImageFrame;
-import de.schoko.rendering.shapes.Rectangle;
 
 public class Player extends GameObject {
 	private Context context;
