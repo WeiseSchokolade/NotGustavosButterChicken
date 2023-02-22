@@ -33,6 +33,7 @@ public class Game extends Menu {
 	private int wave;
 	private double waveCooldown;
 	private Boss bossFight;
+	private int level;
 
 	public Game() {
 		super(true);
@@ -103,7 +104,7 @@ public class Game extends Menu {
 			}
 		});
 		context.getSettings().setBackgroundColor(55, 129, 244);
-		
+
 		// Object Creation
 		player = new Player(this, context, 0, 0);
 
@@ -111,11 +112,7 @@ public class Game extends Menu {
 			for (int y = 0; y < tiles[x].length; y++) {
 				String img = "tile";
 				if (y == 0) {
-					AnimatedImageFrame animatedImageFrame = new AnimatedImageFrame(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5,
-						16, new AnimatedImage(imagePool.getImage("wallWater0"), 500),
-						new AnimatedImage(imagePool.getImage("wallWater1"), 500),
-						new AnimatedImage(imagePool.getImage("wallWater2"), 500));
-					tiles[x][y] = new Tile(animatedImageFrame);
+					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
 					continue;
 				} else if (y == 2 &&
 					      ((x) % 6 == 0)) {
@@ -299,6 +296,22 @@ public class Game extends Menu {
 		}
 	}
 
+	// TODO: Implement actuall ship sinking
+	// Makes ship heavier so it will be lower in the water and eventually sink
+	public void increaseLevel() {
+		level++;
+		for (int x = 0; x < tiles.length; x++) {
+			for (int y = 0; y < tiles[x].length; y++) {
+				if (y == level - 1) {
+					tiles[x][y] = null;
+				}
+				if (y == level) {
+					tiles[x][y].setShape(getWaterWallTile());
+				}
+			}
+		}
+	}
+
 	public void addObject(GameObject gameObject) {
 		this.gameObjects.add(gameObject);
 	}
@@ -309,6 +322,14 @@ public class Game extends Menu {
 
 	public Tile getTile(double x, double y) {
 		return tiles[(int) (Math.floor(x))][(int) (Math.floor(y))];
+	}
+
+	public AnimatedImageFrame getWaterWallTile() {
+		return new AnimatedImageFrame(0, 0,
+						16, new AnimatedImage(getContext().getImagePool().getImage("wallWater0"), 500),
+						new AnimatedImage(getContext().getImagePool().getImage("wallWater1"), 500),
+						new AnimatedImage(getContext().getImagePool().getImage("wallWater2"), 500));
+		
 	}
 
 	public ArrayList<Enemy> getEnemies() {
