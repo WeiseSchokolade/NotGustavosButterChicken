@@ -36,8 +36,8 @@ public class Game extends Menu {
 		this.enemies = new ArrayList<>();
 		this.tiles = new Tile[20][10];
 		this.inventory = new InventoryItem[4];
-		width = tiles.length;
-		height = tiles[0].length;
+		width = tiles.length - 2;
+		height = tiles[0].length - 2;
 
 		// Loading Stuff
 		String basePath = "de/schoko/jamegam25/assets/";
@@ -50,20 +50,26 @@ public class Game extends Menu {
 		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
 		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
 		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
-		imagePool.addImage("sprite", basePath + "sprite.png", ImageLocation.JAR);
+		imagePool.addImage("soda", basePath + "soda.png", ImageLocation.JAR);
+		imagePool.addImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
+		imagePool.addImage("butterChickenShadow", basePath + "butter_chicken_shadow.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s0", basePath + "puddle_s0.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s1", basePath + "puddle_s1.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s2", basePath + "puddle_s2.png", ImageLocation.JAR);
+		imagePool.addImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
 		
 		// Item Setup Part
-		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 3, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
-			// TODO: Heal player
+		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
+			player.setMaxHealth(player.getMaxHealth() + 1);
 		});
-		inventory[1] = new InventoryItem(imagePool.getImage("chilli"), 3, "Chlli", "Makes you faster", Keyboard.TWO, (Player player) -> {
-			// TODO: Make player faster			
+		inventory[1] = new InventoryItem(imagePool.getImage("chilli"), 0, "Chilli", "Makes you faster", Keyboard.TWO, (Player player) -> {
+			player.setSpeed(player.getSpeed() + 0.5);
 		});
-		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 3, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
+		inventory[2] = new InventoryItem(imagePool.getImage("melon"), 0, "Melon", "Heals you over time", Keyboard.THREE, (Player player) -> {
 			// TODO: Heal player over time
 		});
-		inventory[3] = new InventoryItem(imagePool.getImage("sprite"), 3, "Sprite", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
-			// TODO: Make player stronger
+		inventory[3] = new InventoryItem(imagePool.getImage("soda"), 0, "Soda", "Makes you stronger", Keyboard.FOUR, (Player player) -> {
+			player.setDamage(player.getDamage() + 0.5);
 		});
 
 		// Visual Stuff
@@ -82,7 +88,7 @@ public class Game extends Menu {
 
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				tiles[x][y] = new Tile(x - width / 2 + 0.5, y - height / 2 + 0.5, imagePool.getImage("tile"), 16);
+				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage("tile"), 16);
 			}
 		}
 	}
@@ -110,11 +116,37 @@ public class Game extends Menu {
 				}
 			} else {
 				// Spawn new enemies
-				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05) + wave + 1;
+				waveEnemyAmount = (int) Math.round((wave * wave) * 0.05 + wave * Math.random() + 1);
 				spawn(waveEnemyAmount);
 			}
 		}
 
+		// Rendering
+		for (int x = 0; x < tiles.length; x++) {
+			for (int y = 0; y < tiles[x].length; y++) {
+				if (tiles[x][y] != null) {
+					tiles[x][y].render(g, deltaTimeMS);
+				}
+			}
+		}
+		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
+		
+
+		for (int i = 0; i < gameObjects.size(); i++) {
+			gameObjects.get(i).render(g, deltaTimeMS);
+		}
+		
+		for (int i = 0; i < enemies.size(); i++) {
+			enemies.get(i).render(g, deltaTimeMS);
+		}
+
+		player.render(g, deltaTimeMS);
+
+		// Removing objects that are marked as removed
+		gameObjects.removeIf((GameObject gameObject) -> {
+			return gameObject.isRemoved();
+		});
+		
 		// Inventory Part
 		if (getContext().getKeyboard().isPressed(Keyboard.TAB)) {
 			double extraSpacing = 25;
@@ -128,13 +160,21 @@ public class Game extends Menu {
 			double baseX = hud.getWidth() / 2 - inventoryWidth / 2 + extraSpacing;
 			double baseY = 10 + extraSpacing;
 			Font font = new Font("Segoe UI", Font.PLAIN, 15);
+			hud.drawText("Key: ", baseX - extraSpacing + 2, baseY - 10, Color.BLACK, font);
 			for (int i = 0; i < inventory.length; i++) {
 				InventoryItem item = inventory[i];
 				double drawX = baseX + ((double) i / inventory.length) * (inventoryWidth - extraSpacing);
-				hud.drawText("" + (i + 1), drawX + 10, baseY - 10, Color.BLACK, font);
+				hud.drawText("" + (i + 1), drawX + 10, baseY - 10, Color.WHITE, font);
 				hud.drawImage(drawX, baseY, item.getImage(), textureScale);
+				Color color = Color.WHITE;
+				if (item.getAmount() == 0) {
+					color = Color.RED;
+				} else if (item.getAmount() == 1) {
+					color = Color.YELLOW;
+				}
+				hud.drawText("  " + item.getAmount(), drawX + 10, baseY + 30, color, font);
 				if (keyboard.wasRecentlyPressed(item.getKey())) {
-					
+					item.use(player);
 				}
 			}
 			for (int i = 0; i < inventory.length; i++) {
@@ -144,41 +184,23 @@ public class Game extends Menu {
 					if (mouse.getScreenY() > baseY && mouse.getScreenY() < baseY + itemTextureSize) {
 						Canvas canvas = new Canvas();
 						final int margin = 2;
-						double nameWidth = canvas.getFontMetrics(font).stringWidth(item.getName());
+						String text1 = "" + item.getAmount() + " x " + item.getName();
+						double nameWidth = canvas.getFontMetrics(font).stringWidth(text1);
 						double descriptionWidth = canvas.getFontMetrics(font).stringWidth(item.getDescription());
 						double width = (nameWidth > descriptionWidth) ? nameWidth : descriptionWidth;
 						hud.drawRect(mouse.getScreenX(), mouse.getScreenY() - 13, width + 2 * 2, 15 * 2 + margin + margin * 2, Color.WHITE);
-						hud.drawText(item.getName(), mouse.getScreenX() + margin, mouse.getScreenY() + margin, Color.BLACK, font);
+						hud.drawText(text1, mouse.getScreenX() + margin, mouse.getScreenY() + margin, Color.BLACK, font);
 						hud.drawText(item.getDescription(), mouse.getScreenX() + margin, mouse.getScreenY() + margin * 2 + 15, Color.BLACK, font);
 					}
 				}
 			}
+		} else {
+			String text = "Press TAB to view inventory";
+			Font font = new Font("Segoe UI", Font.PLAIN, 15);
+			Canvas canvas = new Canvas();
+			double textWidth = canvas.getFontMetrics(font).stringWidth(text);
+			hud.drawText(text, hud.getWidth() / 2 - textWidth / 2, 25, Color.WHITE, font);
 		}
-
-		// Rendering Part
-		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				if (tiles[x][y] != null) {
-					tiles[x][y].render(g, deltaTimeMS);
-				}
-			}
-		}
-		
-		for (int i = 0; i < enemies.size(); i++) {
-			enemies.get(i).render(g, deltaTimeMS);
-		}
-
-		for (int i = 0; i < gameObjects.size(); i++) {
-			gameObjects.get(i).render(g, deltaTimeMS);
-		}
-
-		player.render(g, deltaTimeMS);
-
-		// Removing objects that are marked as removed
-		gameObjects.removeIf((GameObject gameObject) -> {
-			return gameObject.isRemoved();
-		});
 
 		// HUD Rendering Part
 		hud.drawText("Wave: " + wave, 5, 25, Color.RED, new Font("Segoe UI", Font.BOLD, 25));
@@ -192,6 +214,8 @@ public class Game extends Menu {
 		}
 		hud.drawBar(5, 38.5, 100, 15, perc, Graph.getColor(177, 0, 150), Graph.getColor(127, 0, 100));
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
+		hud.drawBar(5, 60, 100, 15, player.getHealth() / player.getMaxHealth(), Graph.getColor(255, 0, 0), Graph.getColor(200, 0, 0));
+		hud.drawText("Health: " + (int) (Math.round(player.getHealth())) + " / " + (int) (Math.round(player.getMaxHealth())), 10, 71.5, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
 	}
 
 	public void spawn(int max) {
@@ -212,6 +236,9 @@ public class Game extends Menu {
 
 	public void addObject(GameObject gameObject) {
 		this.gameObjects.add(gameObject);
+		this.gameObjects.sort((GameObject a, GameObject b) -> {
+			return a.getZ() - b.getZ();
+		});
 	}
 
 	public void addEnemy(Enemy enemy) {
@@ -226,6 +253,10 @@ public class Game extends Menu {
 		return enemies;
 	}
 
+	public ArrayList<GameObject> getObjects() {
+		return gameObjects;
+	}
+
 	public double getWidth() {
 		return width;
 	}
@@ -236,5 +267,9 @@ public class Game extends Menu {
 
 	public InventoryItem[] getInventory() {
 		return inventory;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

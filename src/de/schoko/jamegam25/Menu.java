@@ -11,6 +11,10 @@ public abstract class Menu {
 
 	}
 
+	public void onLeave(Context context) {
+		
+	}
+
 	public abstract void render(Graph g, double deltaTimeMS);
 	
 	public Project getProject() {
