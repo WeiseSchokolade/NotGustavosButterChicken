@@ -26,7 +26,7 @@ public class Item extends GameObject {
 			inventoryItem.setAmount(inventoryItem.getAmount() + 1);
 			this.remove();
 			return;
-		} else if (dist < 1.5) {
+		} else if (dist < 2) {
 			x += ((player.x - x) / (dist * dist) * deltaTimeMS / 1000);
 			y += ((player.y - y) / (dist * dist) * deltaTimeMS / 1000);
 		}

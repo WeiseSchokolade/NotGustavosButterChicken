@@ -22,18 +22,22 @@ public class Game extends Menu {
 	public static final double MAX_WAVE_COOLDOWN = 10000;
 	public static final int BOSS_FREQUENCY = 5; // Boss every 5 waves
 
-	private Player player;
-	private Tile[][] tiles;
 	private InventoryItem[] inventory;
 	private int width, height;
+	
+	private Player player;
+	private Tile[][] tiles;
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Enemy> enemies;
+	
 	private int waveEnemyAmount;
 	private int enemyLevel;
 	private int wave;
 	private double waveCooldown;
 	private Boss bossFight;
 	private int level;
+	
+	private Scene currentScene;
 
 	public Game() {
 		super(true);
@@ -79,6 +83,7 @@ public class Game extends Menu {
 		imagePool.addImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
 		imagePool.addImage("barrel_s0", basePath + "barrel_s0.png", ImageLocation.JAR);
 		imagePool.addImage("barrel_s1", basePath + "barrel_s1.png", ImageLocation.JAR);
+		imagePool.addImage("barrelShadow", basePath + "barrel_shadow.png", ImageLocation.JAR);
 		
 		// Item Setup Part
 		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
@@ -104,6 +109,11 @@ public class Game extends Menu {
 			}
 		});
 		context.getSettings().setBackgroundColor(55, 129, 244);
+
+		// Scene Preload
+
+
+
 
 		// Object Creation
 		player = new Player(this, context, 0, 0);
@@ -140,6 +150,19 @@ public class Game extends Menu {
 		Keyboard keyboard = getContext().getKeyboard();
 		Mouse mouse = getContext().getMouse();
 
+		// TODO: DEBUG, remove later
+		if (keyboard.wasRecentlyPressed(Keyboard.F2)) {
+			if (enemies.size() > 0) {
+				for (int i = 0; i < enemies.size(); i++) {
+					enemies.get(i).remove();
+				}
+			} else {
+				if (waveCooldown > 0) {
+					waveCooldown = 0;
+				}
+			}
+		}
+
 		// Wave Part
 		if (wave % BOSS_FREQUENCY != 0) {
 			if (waveCooldown > 0) {
@@ -173,7 +196,7 @@ public class Game extends Menu {
 			}
 		}
 
-		// Rendering
+		// Game Object Stuff
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				if (tiles[x][y] != null) {
@@ -260,6 +283,22 @@ public class Game extends Menu {
 			hud.drawText(text, hud.getWidth() / 2 - textWidth / 2, 25, Color.WHITE, font);
 		}
 
+		// Scene stuff
+		if (currentScene != null) {
+			if (keyboard.wasRecentlyPressed(Keyboard.SPACE)) {
+				if (currentScene.isComplete()) {
+					currentScene.stop();
+					currentScene = null;
+				} else {
+					currentScene.skipToEnd();
+				}
+			}
+			if (currentScene != null) {
+				currentScene.advanceScene(deltaTimeMS);
+				currentScene.render(hud);
+			}
+		}
+
 		// HUD Rendering Part
 		hud.drawText("Wave: " + wave, 5, 25, Color.RED, new Font("Segoe UI", Font.BOLD, 25));
 		
@@ -296,7 +335,7 @@ public class Game extends Menu {
 		}
 	}
 
-	// TODO: Implement actuall ship sinking
+	// TODO: Implement actual ship sinking
 	// Makes ship heavier so it will be lower in the water and eventually sink
 	public void increaseLevel() {
 		level++;
@@ -310,6 +349,14 @@ public class Game extends Menu {
 				}
 			}
 		}
+	}
+
+	public void playScene(Scene scene) {
+		if (currentScene != null) {
+			currentScene.stop();
+		}
+		currentScene = scene;
+		currentScene.start();
 	}
 
 	public void addObject(GameObject gameObject) {
@@ -329,7 +376,6 @@ public class Game extends Menu {
 						16, new AnimatedImage(getContext().getImagePool().getImage("wallWater0"), 500),
 						new AnimatedImage(getContext().getImagePool().getImage("wallWater1"), 500),
 						new AnimatedImage(getContext().getImagePool().getImage("wallWater2"), 500));
-		
 	}
 
 	public ArrayList<Enemy> getEnemies() {
@@ -346,6 +392,10 @@ public class Game extends Menu {
 
 	public double getHeight() {
 		return height;
+	}
+
+	public Tile[][] getTiles() {
+		return tiles;
 	}
 
 	public InventoryItem[] getInventory() {

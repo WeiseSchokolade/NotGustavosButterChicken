@@ -1,12 +1,7 @@
 package de.schoko.jamegam25;
 
-import java.io.IOException;
-
 import java.awt.Color;
 import java.awt.Font;
-
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import de.schoko.rendering.Camera;
 import de.schoko.rendering.CameraPath;
@@ -26,12 +21,9 @@ public class MainMenu extends Menu {
 	public void onLoad(Context context) {
 		context.getSettings().setBackgroundColor(78, 188, 208);
 
-		try {
-			sound = new Sound(Project.ASSET_PATH + "sound.wav");
-			sound.start();
-		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
-			e.printStackTrace();
-		}
+		sound = new Sound(Project.ASSET_PATH + "sound.wav");
+		sound.start();
+		
 		context.getCamera().setCameraPath(new CameraPath() {
 			private double t;
 			@Override
@@ -39,7 +31,6 @@ public class MainMenu extends Menu {
 				t += deltaTimeMS / 1000;
 				return new CameraPathPoint(0, Math.sin(t) * 0.0625, 150);
 			}
-			
 		});
 	}
 
