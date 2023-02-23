@@ -21,13 +21,14 @@ public class Item extends GameObject {
 	public void render(Graph g, double deltaTimeMS) {
 		t += deltaTimeMS / 1000;
 		
-		if (distanceTo(player) < 0.25) {
+		double dist = distanceTo(player);
+		if (dist < 0.25) {
 			inventoryItem.setAmount(inventoryItem.getAmount() + 1);
 			this.remove();
 			return;
-		} else if (distanceTo(player) < 1.5) {
-			x += ((player.x - x) / distanceTo(player) * deltaTimeMS / 1000);
-			y += ((player.y - y) / distanceTo(player) * deltaTimeMS / 1000);
+		} else if (dist < 2) {
+			x += ((player.x - x) / (dist * dist) * deltaTimeMS / 1000);
+			y += ((player.y - y) / (dist * dist) * deltaTimeMS / 1000);
 		}
 
 		this.imageFrame.setX(this.getX());

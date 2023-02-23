@@ -15,7 +15,7 @@ public class Player extends GameObject {
 	private ImageFrame imageFrame;
 	// vx and vy are used for velocity
 	protected double vx, vy;
-	private int direction;
+	private boolean facingLeft;
 	private double maxHealth;
 	private double health;
 	private double damage;
@@ -23,9 +23,14 @@ public class Player extends GameObject {
 	private double speed;
 	private double shootCooldown;
 	private double maxShootCooldown = 300;
+	private double damaged;
+	private ArrayList<Long> heals;
 	private ArrayList<Integer> pressedKeys;
 	// Stunned is used for the time the player is stunned, usually 2000 ms (2 seconds)
 	protected double stunned;
+	private Sound movementSound;
+	private boolean playingSound;
+	private Sound hitSound;
 
 	public Player(Game game, Context context, double x, double y) {
 		super(x, y);
@@ -35,15 +40,17 @@ public class Player extends GameObject {
 		this.maxHealth = 3;
 		this.health = maxHealth;
 		this.damage = 1;
-		images = new Image[4];
-		images[0] = context.getImagePool().getImage("playerUp");
-		images[1] = context.getImagePool().getImage("playerDown");
-		images[2] = context.getImagePool().getImage("playerRight");
-		images[3] = context.getImagePool().getImage("playerLeft");
+		images = new Image[2];
+		images[0] = context.getImagePool().getImage("playerRight");
+		images[1] = context.getImagePool().getImage("playerLeft");
 
-		imageFrame = new ImageFrame(x, y, images[direction], 16);
+		imageFrame = new ImageFrame(x, y, images[0], 16);
 
+		heals = new ArrayList<>();
 		pressedKeys = new ArrayList<>();
+		playingSound = true;
+		movementSound = new Sound(Project.ASSET_PATH + "step.wav", true);
+		hitSound = new Sound(Project.ASSET_PATH + "hit.wav", 450);
 	}
 
 	@Override
@@ -65,18 +72,26 @@ public class Player extends GameObject {
 			int lastMovementKey = -1;
 			if (pressedKeys.size() > 0) {
 				lastMovementKey = pressedKeys.get(0);
+				if (!playingSound) {
+					movementSound.start();
+					movementSound.setVolume(0.5);
+					playingSound = true;
+				}
+			} else {
+				if (playingSound) {
+					movementSound.stop();
+					playingSound = false;
+				}
 			}
 			if (lastMovementKey == Keyboard.A || lastMovementKey == Keyboard.LEFT) {
-				direction = 3;
+				facingLeft = true;
 				vx -= speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.D || lastMovementKey == Keyboard.RIGHT) {
-				direction = 2;
+				facingLeft = false;
 				vx += speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.W || lastMovementKey == Keyboard.UP) {
-				direction = 0;
 				vy += speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.S || lastMovementKey == Keyboard.DOWN) {
-				direction = 1;
 				vy -= speed * deltaTimeMS / 1000;
 			}
 		}
@@ -97,9 +112,42 @@ public class Player extends GameObject {
 
 		if (x > game.getWidth() / 2 || x < -game.getWidth() / 2) {
 			x = oldX;
+			stunned = 0;
 		}
 		if (y > game.getHeight() / 2 || y < -game.getHeight() / 2) {
 			y = oldY;
+			stunned = 0;
+		}
+
+		// Damage by puddles
+		ArrayList<GameObject> objects = game.getObjects();
+		for (int i = 0; i < objects.size(); i++) {
+			GameObject gameObject = objects.get(i);
+			if (gameObject instanceof Puddle) {
+				Puddle puddle = (Puddle) gameObject;
+				if (puddle.x > this.x - 0.5 && puddle.x < this.x + 0.5 && puddle.y > this.y - 0.5 && puddle.y < this.y + 0.5) {
+					puddle.setStage(puddle.getStage() + deltaTimeMS / 1000);
+					applyDamage(deltaTimeMS / 1000);
+					break;
+				}
+			}
+		}
+
+		// Healing Part 3000 = 3 Seconds of Healing
+		// Removes all healing times if they're older than 3 seconds
+		if (heals.size() > 0) {
+			for (int i = 0; i < heals.size(); i++) {
+				if (heals.get(i) + 3000 < System.currentTimeMillis()) {
+					heals.remove(i);
+				} else {
+					// There aren't any heals older than this one 
+					break;
+				}
+			}
+			this.health += deltaTimeMS / 1000 * heals.size();
+			if (this.health > maxHealth) {
+				this.health = maxHealth;
+			}
 		}
 
 
@@ -118,8 +166,13 @@ public class Player extends GameObject {
 		// Drawing Part
 		imageFrame.setX(this.x);
 		imageFrame.setY(this.y);
-		imageFrame.setImage(images[direction]);
+		imageFrame.setImage(images[(facingLeft) ? 1 : 0]);
 		g.draw(imageFrame);
+
+		if (damaged > 0) {
+			// TODO: Damage Visual
+			damaged -= deltaTimeMS;
+		}
 	}
 
 	public void checkKey(int key) {
@@ -129,6 +182,15 @@ public class Player extends GameObject {
 		}
 		if (!keyboard.isPressed(key) && pressedKeys.contains(key)) {
 			pressedKeys.remove((Integer) key);
+		}
+	}
+
+	public void applyDamage(double damage) {
+		this.health -= damage;
+		hitSound.start();
+		damaged = 200;
+		if (this.health <= 0) {
+			game.getProject().setMenu(new GameOverDead(game));
 		}
 	}
 	
@@ -149,6 +211,10 @@ public class Player extends GameObject {
 		if (this.maxHealth < health) {
 			this.health = maxHealth;
 		}
+	}
+
+	public void addHeal() {
+		this.heals.add((Long) System.currentTimeMillis());
 	}
 
 	public double getDamage() {
