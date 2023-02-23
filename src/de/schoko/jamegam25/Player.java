@@ -28,6 +28,9 @@ public class Player extends GameObject {
 	private ArrayList<Integer> pressedKeys;
 	// Stunned is used for the time the player is stunned, usually 2000 ms (2 seconds)
 	protected double stunned;
+	private Sound movementSound;
+	private boolean playingSound;
+	private Sound hitSound;
 
 	public Player(Game game, Context context, double x, double y) {
 		super(x, y);
@@ -47,6 +50,9 @@ public class Player extends GameObject {
 
 		heals = new ArrayList<>();
 		pressedKeys = new ArrayList<>();
+		playingSound = true;
+		movementSound = new Sound(Project.ASSET_PATH + "step.wav", true);
+		hitSound = new Sound(Project.ASSET_PATH + "hit.wav", 450);
 	}
 
 	@Override
@@ -68,6 +74,15 @@ public class Player extends GameObject {
 			int lastMovementKey = -1;
 			if (pressedKeys.size() > 0) {
 				lastMovementKey = pressedKeys.get(0);
+				if (!playingSound) {
+					movementSound.start();
+					playingSound = true;
+				}
+			} else {
+				if (playingSound) {
+					movementSound.stop();
+					playingSound = false;
+				}
 			}
 			if (lastMovementKey == Keyboard.A || lastMovementKey == Keyboard.LEFT) {
 				direction = 3;
@@ -100,9 +115,11 @@ public class Player extends GameObject {
 
 		if (x > game.getWidth() / 2 || x < -game.getWidth() / 2) {
 			x = oldX;
+			stunned = 0;
 		}
 		if (y > game.getHeight() / 2 || y < -game.getHeight() / 2) {
 			y = oldY;
+			stunned = 0;
 		}
 
 		// Damage by puddles
@@ -173,6 +190,7 @@ public class Player extends GameObject {
 
 	public void applyDamage(double damage) {
 		this.health -= damage;
+		hitSound.start();
 		damaged = 200;
 		if (this.health <= 0) {
 			// TODO: Game Over

@@ -39,6 +39,23 @@ public class Barrel extends GameObject {
 			}
 		}
 
+		Player player = game.getPlayer();
+		double width = 0.5;
+		double height = 0.5;
+		double playerWidth = 0.5;
+		double playerHeight = 0.5;
+
+		if (player.x < this.x + width &&
+			player.x + playerWidth > this.x &&
+			player.y < this.y + height &&
+			player.y + playerHeight > this.y ) {
+			double direction = Math.atan2(player.getY() - this.y, player.getX() - this.x);
+			player.vx += Math.cos(direction) * deltaTimeMS / 1000 * speed;
+        	player.vy += Math.sin(direction) * deltaTimeMS / 1000 * speed;
+			player.stunned = 500;
+			player.applyDamage(1);
+		}
+
 		drawing.setX(this.x);
 		drawing.setY(this.y);
 		drawing.update(deltaTimeMS);

@@ -36,6 +36,8 @@ public class Game extends Menu {
 	private double waveCooldown;
 	private Boss bossFight;
 	private int level;
+
+	private SceneRenderer protRenderer;
 	
 	private Scene currentScene;
 
@@ -70,6 +72,7 @@ public class Game extends Menu {
 		imagePool.addImage("playerDown", basePath + "playerDown.png", ImageLocation.JAR);
 		imagePool.addImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.addImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
+		imagePool.addImage("protagonist", basePath + "pirate.png", ImageLocation.JAR);
 		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
 		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
 		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
@@ -112,8 +115,10 @@ public class Game extends Menu {
 
 		// Scene Preload
 
-
-
+		protRenderer = (HUDGraph hud, Scene scene) -> {
+			hud.drawImage(-25, -25, imagePool.getImage("protagonist"), 50 / hud.getWidth());
+			scene.drawText(hud);
+		};
 
 		// Object Creation
 		player = new Player(this, context, 0, 0);
@@ -204,13 +209,22 @@ public class Game extends Menu {
 				}
 			}
 		}
-		g.drawRect(-width / 2, -height / 2, width / 2, height / 2);
+		g.drawRect(-width / 2.0 - 0.5, -height / 2.0 - 0.5, width / 2.0 + 0.5, height / 2.0 + 0.5);
 		
 		this.gameObjects.sort((GameObject a, GameObject b) -> {
 			return a.getZ() - b.getZ();
 		});
+
+		int puddleAmount = 0;
 		for (int i = 0; i < gameObjects.size(); i++) {
 			gameObjects.get(i).render(g, deltaTimeMS);
+			if (gameObjects.get(i) instanceof Puddle) {
+				puddleAmount++;
+			}
+		}
+		if (puddleAmount == 10 && level == 0) {
+			increaseLevel();
+			playScene(new Scene("Gustavio", "Hey Hey Hey", protRenderer));
 		}
 		
 		for (int i = 0; i < enemies.size(); i++) {

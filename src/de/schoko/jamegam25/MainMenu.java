@@ -21,7 +21,7 @@ public class MainMenu extends Menu {
 	public void onLoad(Context context) {
 		context.getSettings().setBackgroundColor(78, 188, 208);
 
-		sound = new Sound(Project.ASSET_PATH + "sound.wav");
+		sound = new Sound(Project.ASSET_PATH + "sound.wav", false);
 		sound.start();
 		
 		context.getCamera().setCameraPath(new CameraPath() {

@@ -9,7 +9,6 @@ import de.schoko.rendering.Image;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
 import de.schoko.rendering.Keyboard;
-import de.schoko.rendering.Mouse;
 
 public class IntroMenu extends Menu {
 	private ArrayList<Scene> scenes;
@@ -81,7 +80,7 @@ public class IntroMenu extends Menu {
 		scenes.add(new Scene("Mary: ", "Oi!", antRenderer, Project.ASSET_PATH + "oi.wav"));
 		scenes.add(new Scene("Mary: ", "You stole my precious butter chicken my grandma made for me!", antRenderer));
 		scenes.add(new Scene("Mary: ", "Get him, boys!!!", antRenderer));
-
+		
 		// First Scene Loading
 		currentScene = scenes.remove(0);
 		currentScene.start();

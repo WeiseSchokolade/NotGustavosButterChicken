@@ -54,8 +54,22 @@ public class Enemy extends GameObject {
 		}
 
 		// Movement apply
-		this.x += vx;
-		this.y += vy;
+		if (isInArea()) {
+			double oldX = x, oldY = y;
+			this.x += vx;
+			if (!isInArea()) {
+				this.x = oldX;
+				stunned = 0;
+			}
+			this.y += vy;
+			if (!isInArea()) {
+				this.y = oldY;
+				stunned = 0;
+			}
+		} else {
+			this.x += vx;
+			this.y += vy;
+		}
 
 		// Damage by puddles
 		ArrayList<GameObject> objects = game.getObjects();
@@ -78,6 +92,10 @@ public class Enemy extends GameObject {
 			g.draw(new Rectangle(x - 0.5, y - 0.5, 1, 1, Graph.getColor(255, 0, 0, 80)));
 			damaged -= deltaTimeMS;
 		}
+	}
+
+	public boolean isInArea() {
+		return (this.x > - game.getWidth() / 2 && this.x < game.getWidth() / 2 && this.y > - game.getHeight() / 2 && this.y < game.getHeight() / 2);
 	}
 
 	public void applyDamage(double damage) {

@@ -1,6 +1,7 @@
 package de.schoko.jamegam25;
 
 import java.awt.Font;
+import java.awt.Color;
 
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.HUDGraph;
@@ -29,7 +30,7 @@ public class Scene {
 
 	public void start() {
 		if (path != null) {
-			Sound sound = new Sound(path);
+			Sound sound = new Sound(path, false);
 			sound.start();
 		}
 	}
@@ -76,8 +77,13 @@ public class Scene {
 		double margin = 20;
 		hud.drawRect(0, hud.getHeight() - 200, hud.getWidth(), 200, Graph.getColor(0, 0, 0, 200));
 		String[] lines = getText().split("\\n");
+		Font font = new Font("Segoe UI", Font.PLAIN, 35);
 		for (int i = 0; i < lines.length; i++) {
-			hud.drawText(lines[i], 5, hud.getHeight() - 200 + margin + 15 + 40 * i, Graph.getColor(255, 255, 255), new Font("Segoe UI", Font.PLAIN, 35));
+			hud.drawText(lines[i], 5, hud.getHeight() - 200 + margin + 15 + 40 * i, Graph.getColor(255, 255, 255), font);
 		}
+		font = new Font("Segoe UI", Font.PLAIN, 15);
+		String text = "Space to close/skip";
+		double stringWidth = Graph.getStringWidth(text, font);
+		hud.drawText(text, hud.getWidth() - stringWidth, hud.getHeight() - font.getSize() + 10, Color.GRAY, font);
 	}
 }
