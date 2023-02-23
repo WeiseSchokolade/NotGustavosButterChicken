@@ -73,6 +73,6 @@ public class Bullet extends GameObject{
 	@Override
 	public void remove() {
 		super.remove();
-		game.addObject(new Puddle(x, y, game.getContext().getImagePool()));
+		game.addObject(new Puddle(x, y, game));
 	}
 }

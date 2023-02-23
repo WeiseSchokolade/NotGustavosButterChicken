@@ -15,7 +15,7 @@ public class Player extends GameObject {
 	private ImageFrame imageFrame;
 	// vx and vy are used for velocity
 	protected double vx, vy;
-	private int direction;
+	private boolean facingLeft;
 	private double maxHealth;
 	private double health;
 	private double damage;
@@ -40,13 +40,11 @@ public class Player extends GameObject {
 		this.maxHealth = 3;
 		this.health = maxHealth;
 		this.damage = 1;
-		images = new Image[4];
-		images[0] = context.getImagePool().getImage("playerUp");
-		images[1] = context.getImagePool().getImage("playerDown");
-		images[2] = context.getImagePool().getImage("playerRight");
-		images[3] = context.getImagePool().getImage("playerLeft");
+		images = new Image[2];
+		images[0] = context.getImagePool().getImage("playerRight");
+		images[1] = context.getImagePool().getImage("playerLeft");
 
-		imageFrame = new ImageFrame(x, y, images[direction], 16);
+		imageFrame = new ImageFrame(x, y, images[0], 16);
 
 		heals = new ArrayList<>();
 		pressedKeys = new ArrayList<>();
@@ -76,6 +74,7 @@ public class Player extends GameObject {
 				lastMovementKey = pressedKeys.get(0);
 				if (!playingSound) {
 					movementSound.start();
+					movementSound.setVolume(0.5);
 					playingSound = true;
 				}
 			} else {
@@ -85,16 +84,14 @@ public class Player extends GameObject {
 				}
 			}
 			if (lastMovementKey == Keyboard.A || lastMovementKey == Keyboard.LEFT) {
-				direction = 3;
+				facingLeft = true;
 				vx -= speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.D || lastMovementKey == Keyboard.RIGHT) {
-				direction = 2;
+				facingLeft = false;
 				vx += speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.W || lastMovementKey == Keyboard.UP) {
-				direction = 0;
 				vy += speed * deltaTimeMS / 1000;
 			} else if (lastMovementKey == Keyboard.S || lastMovementKey == Keyboard.DOWN) {
-				direction = 1;
 				vy -= speed * deltaTimeMS / 1000;
 			}
 		}
@@ -169,7 +166,7 @@ public class Player extends GameObject {
 		// Drawing Part
 		imageFrame.setX(this.x);
 		imageFrame.setY(this.y);
-		imageFrame.setImage(images[direction]);
+		imageFrame.setImage(images[(facingLeft) ? 1 : 0]);
 		g.draw(imageFrame);
 
 		if (damaged > 0) {
@@ -193,7 +190,7 @@ public class Player extends GameObject {
 		hitSound.start();
 		damaged = 200;
 		if (this.health <= 0) {
-			// TODO: Game Over
+			game.getProject().setMenu(new GameOverDead(game));
 		}
 	}
 	

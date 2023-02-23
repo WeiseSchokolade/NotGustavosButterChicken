@@ -13,6 +13,7 @@ import de.schoko.rendering.CameraPathPoint;
 import de.schoko.rendering.Context;
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.HUDGraph;
+import de.schoko.rendering.Image;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
 import de.schoko.rendering.Keyboard;
@@ -21,9 +22,10 @@ import de.schoko.rendering.Mouse;
 public class Game extends Menu {
 	public static final double MAX_WAVE_COOLDOWN = 10000;
 	public static final int BOSS_FREQUENCY = 5; // Boss every 5 waves
+	public static final int WIDTH = 20, HEIGHT = 10;
+	public static final double TILE_SIZE = 15.5;
 
 	private InventoryItem[] inventory;
-	private int width, height;
 	
 	private Player player;
 	private Tile[][] tiles;
@@ -50,9 +52,6 @@ public class Game extends Menu {
 		// Array Instanciation
 		this.gameObjects = new ArrayList<>();
 		this.enemies = new ArrayList<>();
-		width = 20;
-		height = 10;
-		this.tiles = new Tile[width + 2 + 2][height + 2 + 8];
 		this.inventory = new InventoryItem[4];
 		wave = 1;
 
@@ -60,6 +59,7 @@ public class Game extends Menu {
 		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
 		imagePool.addImage("tile", basePath + "tile.png", ImageLocation.JAR);
+		imagePool.addImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
 		imagePool.addImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
 		imagePool.addImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
 		imagePool.addImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
@@ -68,8 +68,6 @@ public class Game extends Menu {
 		imagePool.addImage("wallWater2", basePath + "wallWater_2.png", ImageLocation.JAR);
 		imagePool.addImage("wallBullseye", basePath + "wallBullseye.png", ImageLocation.JAR);
 		imagePool.addImage("wallCannon", basePath + "wallCannon.png", ImageLocation.JAR);
-		imagePool.addImage("playerUp", basePath + "playerUp.png", ImageLocation.JAR);
-		imagePool.addImage("playerDown", basePath + "playerDown.png", ImageLocation.JAR);
 		imagePool.addImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.addImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
 		imagePool.addImage("protagonist", basePath + "pirate.png", ImageLocation.JAR);
@@ -88,6 +86,9 @@ public class Game extends Menu {
 		imagePool.addImage("barrel_s1", basePath + "barrel_s1.png", ImageLocation.JAR);
 		imagePool.addImage("barrelShadow", basePath + "barrel_shadow.png", ImageLocation.JAR);
 		
+		// Tile setup part
+		this.tiles = genTiles();
+
 		// Item Setup Part
 		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
 			player.setMaxHealth(player.getMaxHealth() + 1);
@@ -116,37 +117,15 @@ public class Game extends Menu {
 		// Scene Preload
 
 		protRenderer = (HUDGraph hud, Scene scene) -> {
-			hud.drawImage(-25, -25, imagePool.getImage("protagonist"), 50 / hud.getWidth());
+			double scale = (50 / hud.getWidth());
+			Image image = imagePool.getImage("protagonist");
+			hud.drawImage(25, hud.getHeight() - image.getAWTImage().getHeight(null) / scale - 100, image, scale);
+			
 			scene.drawText(hud);
 		};
 
 		// Object Creation
 		player = new Player(this, context, 0, 0);
-
-		for (int x = 0; x < tiles.length; x++) {
-			for (int y = 0; y < tiles[x].length; y++) {
-				String img = "tile";
-				if (y == 0) {
-					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
-					continue;
-				} else if (y == 2 &&
-					      ((x + 0) % 6 == 1)) {
-					img = "wallBullseye";
-				} else if (y == 2 &&
-						  ((x + 3) % 6 == 1)) {
-		  			img = "wallCannon";
-	  			} else if (y < 3) {
-					img = "wallTileFront";
-				} else if (y == 3) {
-					img = "wallTopFront";
-				} else if (y >= tiles[x].length - 3) {
-					continue;
-				} else if (y == tiles[x].length - 4) {
-					img = "wallTopBack";
-				}
-				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, imagePool.getImage(img), 16);
-			}
-		}
 	}
 
 	@Override
@@ -166,6 +145,9 @@ public class Game extends Menu {
 					waveCooldown = 0;
 				}
 			}
+		}
+		if (keyboard.wasRecentlyPressed(Keyboard.F3)) {
+			getProject().setMenu(new GameOverDead(this));
 		}
 
 		// Wave Part
@@ -209,7 +191,7 @@ public class Game extends Menu {
 				}
 			}
 		}
-		g.drawRect(-width / 2.0 - 0.5, -height / 2.0 - 0.5, width / 2.0 + 0.5, height / 2.0 + 0.5);
+		g.drawRect(-WIDTH / 2.0 - 0.5, -HEIGHT / 2.0 - 0.5, WIDTH / 2.0 + 0.5, HEIGHT / 2.0 + 0.5);
 		
 		this.gameObjects.sort((GameObject a, GameObject b) -> {
 			return a.getZ() - b.getZ();
@@ -331,25 +313,28 @@ public class Game extends Menu {
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
 		hud.drawBar(5, 60, 100, 15, player.getHealth() / player.getMaxHealth(), Graph.getColor(255, 0, 0), Graph.getColor(200, 0, 0));
 		hud.drawText("Health: " + (int) (Math.round(player.getHealth())) + " / " + (int) (Math.round(player.getMaxHealth())), 10, 71.5, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
+
+		// TODO: Remove
+		g.drawString("Puddles: " + puddleAmount, 0, HEIGHT / 2 + 1, Color.WHITE, new Font("Segoe UI", Font.BOLD, 25));
 	}
 
 	public void spawn(int max) {
-		double spawnWidth = width * 0.9;
+		double spawnWidth = WIDTH * 0.9;
 		for (int i = 0; i < max; i++) {
-			double x = Math.random() * spawnWidth - width / 2;
+			double x = Math.random() * spawnWidth - WIDTH / 2;
 			double y = 0;
 			if (Math.random() >= 0.5) {
 				// Spawn at top
-				y = height / 2 + 2;
+				y = HEIGHT / 2 + 2;
 			} else {
 				// Spawn at bottom
-				y = - height / 2 - 2;
+				y = - HEIGHT / 2 - 2;
 			}
 			addEnemy(new Enemy(this, player, x, y));
 		}
 	}
 
-	// TODO: Implement actual ship sinking
+	// TODO: Implement actual ship sinking (Game Over)
 	// Makes ship heavier so it will be lower in the water and eventually sink
 	public void increaseLevel() {
 		level++;
@@ -363,6 +348,35 @@ public class Game extends Menu {
 				}
 			}
 		}
+	}
+
+	public Tile[][] genTiles() {
+		Tile[][] tiles = new Tile[WIDTH + 2 + 2][HEIGHT + 2 + 8];
+		for (int x = 0; x < tiles.length; x++) {
+			for (int y = 0; y < tiles[x].length; y++) {
+				String img = "tile";
+				if (y == 0) {
+					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
+					continue;
+				} else if (y == 2 &&
+					      ((x + 0) % 6 == 1)) {
+					img = "wallBullseye";
+				} else if (y == 2 &&
+						  ((x + 3) % 6 == 1)) {
+		  			img = "wallCannon";
+	  			} else if (y < 3) {
+					img = "wallTileFront";
+				} else if (y == 3) {
+					img = "wallTopFront";
+				} else if (y >= tiles[x].length - 3) {
+					continue;
+				} else if (y == tiles[x].length - 4) {
+					img = "wallTopBack";
+				}
+				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getContext().getImagePool().getImage(img), TILE_SIZE);
+			}
+		}
+		return tiles;
 	}
 
 	public void playScene(Scene scene) {
@@ -385,9 +399,13 @@ public class Game extends Menu {
 		return tiles[(int) (Math.floor(x))][(int) (Math.floor(y))];
 	}
 
+	public void setTile(Tile tile, double x, double y) {
+		tiles[(int) (Math.floor(x))][(int) (Math.floor(y))] = tile;
+	}
+
 	public AnimatedImageFrame getWaterWallTile() {
 		return new AnimatedImageFrame(0, 0,
-						16, new AnimatedImage(getContext().getImagePool().getImage("wallWater0"), 500),
+						TILE_SIZE, new AnimatedImage(getContext().getImagePool().getImage("wallWater0"), 500),
 						new AnimatedImage(getContext().getImagePool().getImage("wallWater1"), 500),
 						new AnimatedImage(getContext().getImagePool().getImage("wallWater2"), 500));
 	}
@@ -401,11 +419,11 @@ public class Game extends Menu {
 	}
 
 	public double getWidth() {
-		return width;
+		return WIDTH;
 	}
 
 	public double getHeight() {
-		return height;
+		return HEIGHT;
 	}
 
 	public Tile[][] getTiles() {

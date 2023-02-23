@@ -61,7 +61,7 @@ public class Barrel extends GameObject {
 		drawing.update(deltaTimeMS);
 		shadow.setX(drawing.getX() + 0.25);
 		shadow.setY(drawing.getY() - 0.25);
-		//g.draw(shadow);
+		g.draw(shadow);
 		g.draw(drawing);
 	}
 	

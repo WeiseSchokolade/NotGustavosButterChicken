@@ -10,6 +10,7 @@ import de.schoko.rendering.shapes.Shape;
 public class Tile {
 	private double x, y;
     private Shape shape;
+	private boolean deadly;
 
     public Tile(Shape shape) {
         this.shape = shape;
@@ -63,5 +64,13 @@ public class Tile {
 			animatedImageFrame.setY(y);
 		}
 		this.shape = shape;
+	}
+
+	public void setDeadly(boolean deadly) {
+		this.deadly = deadly;
+	}
+
+	public boolean isDeadly() {
+		return this.deadly;
 	}
 }
