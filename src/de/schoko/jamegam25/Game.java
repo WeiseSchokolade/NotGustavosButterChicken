@@ -125,10 +125,10 @@ public class Game extends Menu {
 					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
 					continue;
 				} else if (y == 2 &&
-					      ((x) % 6 == 0)) {
+					      ((x + 0) % 6 == 1)) {
 					img = "wallBullseye";
 				} else if (y == 2 &&
-						  ((x + 3) % 6 == 0)) {
+						  ((x + 3) % 6 == 1)) {
 		  			img = "wallCannon";
 	  			} else if (y < 3) {
 					img = "wallTileFront";
