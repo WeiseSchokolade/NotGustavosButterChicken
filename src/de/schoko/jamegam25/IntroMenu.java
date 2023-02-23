@@ -68,22 +68,24 @@ public class IntroMenu extends Menu {
 
 		// Scene Loading
 
-		scenes.add(new Scene("", "", wakeUpRenderer));
-		scenes.add(new Scene("Gustavo: ", "Henlo I am protagonist Gustavo", protRenderer));
-		scenes.add(new Scene("Mary: ", "Henlo me Mary", antRenderer));
-		scenes.add(new Scene("Gustavo: ", "u-uh w-where am I?", protRenderer));
-		scenes.add(new Scene("Gustavo: ", "Is this a ship?", protRenderer));
-		scenes.add(new Scene("Gustavo: ", "WAIT, WHAT AM I DOING ON SEA?", protRenderer));
-		scenes.add(new Scene("Gustavo: ", "I can't remember anything...", protRenderer));
-		scenes.add(new Scene("Gustavo: ", "What is this in my hand?", protRenderer));
-		scenes.add(new Scene("Gustavo: ", "An infinite supply of butter chicken?", butterChickenRenderer));
-		scenes.add(new Scene("Mary: ", "Oi!", antRenderer, Project.ASSET_PATH + "oi.wav"));
-		scenes.add(new Scene("Mary: ", "You stole my precious butter chicken my grandma made for me!", antRenderer));
-		scenes.add(new Scene("Mary: ", "Get him, boys!!!", antRenderer));
-		
+		scenes.add(new Scene(this, "", "", wakeUpRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "u-uh w-where am I?", protRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "Is this a ship?", protRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "WAIT, WHAT AM I DOING ON SEA?", protRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "I can't remember anything...", protRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "What is this in my hand?", protRenderer));
+		scenes.add(new Scene(this, "Gustavo: ", "An infinite supply of butter chicken?", butterChickenRenderer));
+		scenes.add(new Scene(this, "Mary: ", "Oi!", antRenderer));
+		scenes.add(new Scene(this, "Mary: ", "You stole my precious butter chicken my grandma made for me!", antRenderer));
+		scenes.add(new Scene(this, "Mary: ", "Get him, boys!!!", antRenderer));
+
 		// First Scene Loading
 		currentScene = scenes.remove(0);
-		currentScene.start();
+
+		// Play Wave Sound
+		Sound sound = new Sound(this, Project.ASSET_PATH + "wave.wav", true);
+		sound.start();
+		sound.setVolume(0.25);
 	}
 
 	@Override
@@ -120,8 +122,6 @@ public class IntroMenu extends Menu {
 	}
 	
 	public void nextScene() {
-		currentScene.stop();
 		currentScene = scenes.remove(0);
-		currentScene.start();
 	}
 }

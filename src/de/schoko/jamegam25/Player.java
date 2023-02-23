@@ -49,8 +49,8 @@ public class Player extends GameObject {
 		heals = new ArrayList<>();
 		pressedKeys = new ArrayList<>();
 		playingSound = true;
-		movementSound = new Sound(Project.ASSET_PATH + "step.wav", true);
-		hitSound = new Sound(Project.ASSET_PATH + "hit.wav", 450);
+		movementSound = new Sound(game, Project.ASSET_PATH + "step.wav", true);
+		hitSound = new Sound(game, Project.ASSET_PATH + "hit.wav", 450);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class Sound {
 	/**
 	 * @param path Path to location in jar
 	 */
-	public Sound(String path, boolean loop) {
+	public Sound(Menu menu, String path, boolean loop) {
 		this.loop = loop;
 		try {
 			clip = AudioSystem.getClip();
@@ -33,6 +33,7 @@ public class Sound {
 			e.printStackTrace();
 			clip = null;
 		}
+		menu.addSound(this);
 	}
 	
 	/**
@@ -40,7 +41,7 @@ public class Sound {
 	 * @param path Path to location in jar
 	 * @param length estimated length of the sound before it can be played again
 	 */
-	public Sound(String path, double length) {
+	public Sound(Menu menu, String path, double length) {
 		this.loop = false;
 		this.length = length;
 		try {

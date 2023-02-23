@@ -31,7 +31,7 @@ public class MainMenu extends Menu {
 		playButton = new Button("Play", 0, 0, 1.5, 0.5, "button", 32, context);
 		skipButton = new Button("Skip", 0, -0.5, 1.5, 0.5, "button", 32, context);
 
-		sound = new Sound(Project.ASSET_PATH + "sound.wav", false);
+		sound = new Sound(this, Project.ASSET_PATH + "menu_song.wav", false);
 		sound.start();
 		
 		context.getCamera().setCameraPath(new CameraPath() {
@@ -61,12 +61,5 @@ public class MainMenu extends Menu {
 		}
 		g.draw(playButton);
 		g.draw(skipButton);
-	}
-
-	@Override
-	public void onLeave(Context context) {
-		if (sound != null) {
-			sound.stop();
-		}
 	}
 }

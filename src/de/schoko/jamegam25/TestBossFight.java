@@ -14,7 +14,7 @@ public class TestBossFight extends Boss {
 		t = 50000;
 		this.game = game;
 		ImagePool imagePool = game.getContext().getImagePool();
-		game.playScene(new Scene("Mary", "Ayo watcha doin", (HUDGraph hud, Scene scene) -> {
+		game.playScene(new Scene(game, "Mary", "Ayo watcha doin", (HUDGraph hud, Scene scene) -> {
 			double scale = (50 / hud.getWidth());
 			Image image = imagePool.getImage("antagonist");
 			hud.drawImage(hud.getWidth() - image.getAWTImage().getWidth(null) / scale, hud.getHeight() - image.getAWTImage().getHeight(null) / scale - 100, image, scale);

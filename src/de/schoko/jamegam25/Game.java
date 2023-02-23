@@ -41,6 +41,7 @@ public class Game extends Menu {
 
 	private SceneRenderer protRenderer;
 	
+	private ArrayList<Scene> pendingScenes;
 	private Scene currentScene;
 
 	public Game() {
@@ -61,6 +62,8 @@ public class Game extends Menu {
 		imagePool.addImage("tile", basePath + "tile.png", ImageLocation.JAR);
 		imagePool.addImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
 		imagePool.addImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
+		imagePool.addImage("wallLeftFront", basePath + "wall_left_front.png", ImageLocation.JAR);
+		imagePool.addImage("wallTopLeftFront", basePath + "wall_top_left_front.png", ImageLocation.JAR);
 		imagePool.addImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
 		imagePool.addImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
 		imagePool.addImage("wallWater0", basePath + "wallWater_0.png", ImageLocation.JAR);
@@ -206,7 +209,7 @@ public class Game extends Menu {
 		}
 		if (puddleAmount == 10 && level == 0) {
 			increaseLevel();
-			playScene(new Scene("Gustavio", "Hey Hey Hey", protRenderer));
+			playScene(new Scene(this, "Gustavio", "Hey Hey Hey", protRenderer));
 		}
 		
 		for (int i = 0; i < enemies.size(); i++) {
@@ -283,8 +286,7 @@ public class Game extends Menu {
 		if (currentScene != null) {
 			if (keyboard.wasRecentlyPressed(Keyboard.SPACE)) {
 				if (currentScene.isComplete()) {
-					currentScene.stop();
-					currentScene = null;
+					endScene();
 				} else {
 					currentScene.skipToEnd();
 				}
@@ -313,9 +315,6 @@ public class Game extends Menu {
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
 		hud.drawBar(5, 60, 100, 15, player.getHealth() / player.getMaxHealth(), Graph.getColor(255, 0, 0), Graph.getColor(200, 0, 0));
 		hud.drawText("Health: " + (int) (Math.round(player.getHealth())) + " / " + (int) (Math.round(player.getMaxHealth())), 10, 71.5, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
-
-		// TODO: Remove
-		g.drawString("Puddles: " + puddleAmount, 0, HEIGHT / 2 + 1, Color.WHITE, new Font("Segoe UI", Font.BOLD, 25));
 	}
 
 	public void spawn(int max) {
@@ -351,13 +350,25 @@ public class Game extends Menu {
 	}
 
 	public Tile[][] genTiles() {
-		Tile[][] tiles = new Tile[WIDTH + 2 + 2][HEIGHT + 2 + 8];
+		Tile[][] tiles = new Tile[WIDTH + 2 + 12][HEIGHT + 2 + 8];
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				String img = "tile";
-				if (y == 0) {
-					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
-					continue;
+				if (x > tiles.length - 6) {
+					if (y < 6) {
+						img = "wallTileFront";
+						if (y > 3) {
+							if (x == tiles.length - 5) {
+								img = "wallLeftFront";
+							}
+						}
+					} else if (y == 6) {
+						if (x == tiles.length - 5) {
+							img = "wallTopLeftFront";
+						} else {
+							img = "wallTopFront";
+						}
+					}
 				} else if (y == 2 &&
 					      ((x + 0) % 6 == 1)) {
 					img = "wallBullseye";
@@ -373,6 +384,10 @@ public class Game extends Menu {
 				} else if (y == tiles[x].length - 4) {
 					img = "wallTopBack";
 				}
+				if (y == 0) {
+					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
+					continue;
+				}
 				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getContext().getImagePool().getImage(img), TILE_SIZE);
 			}
 		}
@@ -380,11 +395,19 @@ public class Game extends Menu {
 	}
 
 	public void playScene(Scene scene) {
-		if (currentScene != null) {
-			currentScene.stop();
+		if (currentScene == null) {
+			currentScene = scene;
+		} else {
+			pendingScenes.add(scene);
 		}
-		currentScene = scene;
-		currentScene.start();
+	}
+
+	public void endScene() {
+		if (pendingScenes.size() > 0) {
+			currentScene = pendingScenes.remove(0);
+		} else {
+			currentScene = null;
+		}
 	}
 
 	public void addObject(GameObject gameObject) {

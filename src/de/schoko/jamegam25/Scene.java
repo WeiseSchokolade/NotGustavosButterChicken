@@ -8,37 +8,18 @@ import de.schoko.rendering.HUDGraph;
 
 public class Scene {
 	public static final double TIME_PER_CHARACTER = 100;
+
+	private Menu menu;
 	private String prefix;
 	private String text;
 	private double t;
-	private String path;
-	private Sound sound;
 	private SceneRenderer renderer;
 	
-	public Scene(String prefix, String text, SceneRenderer renderer) {
+	public Scene(Menu menu, String prefix, String text, SceneRenderer renderer) {
 		this.prefix = prefix; // In this case, prefix means something that is written before the actual text
 		this.text = text;
 		this.renderer = renderer;
-	}
-
-	public Scene(String prefix, String text, SceneRenderer renderer, String path) {
-		this.prefix = prefix; // In this case, prefix means something that is written before the actual text
-		this.text = text;
-		this.renderer = renderer;
-		this.path = path;
-	}
-
-	public void start() {
-		if (path != null) {
-			Sound sound = new Sound(path, false);
-			sound.start();
-		}
-	}
-
-	public void stop() {
-		if (sound != null) {
-			sound.stop();
-		}
+		this.menu = menu;
 	}
 
 	public void render(HUDGraph g) {
@@ -46,13 +27,13 @@ public class Scene {
 	}
 
 	public void advanceScene(double deltaTimeMS) {
-		//String previousText = getText();
+		String previousText = getText();
 		t += deltaTimeMS;
-		//if (!previousText.equalsIgnoreCase(getText())) {
-		//	
-		//	Sound sound = new Sound("de/schoko/jamegam25/assets/gurgle.wav");
-		//	sound.start();
-		//}
+		if (!previousText.equalsIgnoreCase(getText())) {
+			
+			Sound sound = new Sound(menu,Project.ASSET_PATH + "speak.wav", false);
+			sound.start();
+		}
 	}
 
 	public String getText() {

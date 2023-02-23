@@ -50,11 +50,10 @@ public class GameOverSink extends Menu {
 
 		// Scene Loading
 
-		scenes.add(new Scene("Mary: ", "Oh no, what have you done?", protRenderer));
+		scenes.add(new Scene(this, "Mary: ", "Oh no, what have you done?", protRenderer));
 		
 		// First Scene Loading
 		currentScene = scenes.remove(0);
-		currentScene.start();
 	}
 
 	@Override
@@ -91,8 +90,6 @@ public class GameOverSink extends Menu {
 	}
 	
 	public void nextScene() {
-		currentScene.stop();
 		currentScene = scenes.remove(0);
-		currentScene.start();
 	}
 }
