@@ -229,7 +229,7 @@ public class Game extends Menu {
 				}
 			}
 		}
-		g.drawRect(-WIDTH / 2.0 - 0.5, -HEIGHT / 2.0 - 0.5, WIDTH / 2.0 + 0.5, HEIGHT / 2.0 + 0.5);
+		//g.drawRect(-WIDTH / 2.0 - 0.5, -HEIGHT / 2.0 - 0.5, WIDTH / 2.0 + 0.5, HEIGHT / 2.0 + 0.5);
 		
 		this.gameObjects.sort((GameObject a, GameObject b) -> {
 			return a.getZ() - b.getZ();
