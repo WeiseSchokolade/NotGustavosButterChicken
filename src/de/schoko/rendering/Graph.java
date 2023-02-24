@@ -243,4 +243,9 @@ public class Graph {
     public HUDGraph getHUD() {
     	return hud;
     }
+    
+    // TODO: Remove this, it was just added because your text is always on the right
+    public Graphics2D getAWTGraphics() {
+    	return g2D;
+    }
 }

@@ -66,6 +66,7 @@ public class Panel extends JPanel {
 				if (rendererSettings.isCrashingOnException()) {
 					throw e;
 				}
+				e.printStackTrace();
 			}
 			graph.finalize();
 			

@@ -28,10 +28,10 @@ public class IntroMenu extends Menu {
 		// Asset Loading
 		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
-		imagePool.addImage("pirate", basePath + "pirate.png", ImageLocation.JAR);
-		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
-		imagePool.addImage("backdrop", basePath + "backdrop.png", ImageLocation.JAR);
-		imagePool.addImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
+		imagePool.loadImage("pirate", basePath + "pirate.png", ImageLocation.JAR);
+		imagePool.loadImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
+		imagePool.loadImage("backdrop", basePath + "backdrop.png", ImageLocation.JAR);
+		imagePool.loadImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
 
 		// Scene Preload
 		SceneRenderer wakeUpRenderer = (HUDGraph hud, Scene scene) -> {

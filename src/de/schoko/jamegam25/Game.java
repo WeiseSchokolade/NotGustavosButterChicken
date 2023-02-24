@@ -54,40 +54,47 @@ public class Game extends Menu {
 		this.gameObjects = new ArrayList<>();
 		this.enemies = new ArrayList<>();
 		this.inventory = new InventoryItem[4];
+		this.pendingScenes = new ArrayList<>();
 		wave = 1;
 
 		// Loading Stuff
 		String basePath = Project.ASSET_PATH;
 		ImagePool imagePool = context.getImagePool();
-		imagePool.addImage("tile", basePath + "tile.png", ImageLocation.JAR);
-		imagePool.addImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
-		imagePool.addImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
-		imagePool.addImage("wallLeftFront", basePath + "wall_left_front.png", ImageLocation.JAR);
-		imagePool.addImage("wallTopLeftFront", basePath + "wall_top_left_front.png", ImageLocation.JAR);
-		imagePool.addImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
-		imagePool.addImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
-		imagePool.addImage("wallWater0", basePath + "wallWater_0.png", ImageLocation.JAR);
-		imagePool.addImage("wallWater1", basePath + "wallWater_1.png", ImageLocation.JAR);
-		imagePool.addImage("wallWater2", basePath + "wallWater_2.png", ImageLocation.JAR);
-		imagePool.addImage("wallBullseye", basePath + "wallBullseye.png", ImageLocation.JAR);
-		imagePool.addImage("wallCannon", basePath + "wallCannon.png", ImageLocation.JAR);
-		imagePool.addImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
-		imagePool.addImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
-		imagePool.addImage("protagonist", basePath + "pirate.png", ImageLocation.JAR);
-		imagePool.addImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
-		imagePool.addImage("apple", basePath + "apple.png", ImageLocation.JAR);
-		imagePool.addImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
-		imagePool.addImage("melon", basePath + "melon.png", ImageLocation.JAR);
-		imagePool.addImage("soda", basePath + "soda.png", ImageLocation.JAR);
-		imagePool.addImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
-		imagePool.addImage("butterChickenShadow", basePath + "butter_chicken_shadow.png", ImageLocation.JAR);
-		imagePool.addImage("puddle_s0", basePath + "puddle_s0.png", ImageLocation.JAR);
-		imagePool.addImage("puddle_s1", basePath + "puddle_s1.png", ImageLocation.JAR);
-		imagePool.addImage("puddle_s2", basePath + "puddle_s2.png", ImageLocation.JAR);
-		imagePool.addImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
-		imagePool.addImage("barrel_s0", basePath + "barrel_s0.png", ImageLocation.JAR);
-		imagePool.addImage("barrel_s1", basePath + "barrel_s1.png", ImageLocation.JAR);
-		imagePool.addImage("barrelShadow", basePath + "barrel_shadow.png", ImageLocation.JAR);
+		imagePool.loadImage("tile", basePath + "tile.png", ImageLocation.JAR);
+		imagePool.loadImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
+		imagePool.loadImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallLeftFront", basePath + "wall_left_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallTopLeftFront", basePath + "wall_top_left_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
+		imagePool.loadImage("wallWater0", basePath + "wallWater_0.png", ImageLocation.JAR);
+		imagePool.loadImage("wallWater1", basePath + "wallWater_1.png", ImageLocation.JAR);
+		imagePool.loadImage("wallWater2", basePath + "wallWater_2.png", ImageLocation.JAR);
+		imagePool.loadImage("wallBullseye", basePath + "wallBullseye.png", ImageLocation.JAR);
+		imagePool.loadImage("wallCannon", basePath + "wallCannon.png", ImageLocation.JAR);
+		imagePool.loadImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
+		imagePool.loadImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
+		imagePool.loadImage("playerLeftDamage", basePath + "playerLeftDamage.png", ImageLocation.JAR);
+		imagePool.loadImage("playerRightDamage", basePath + "playerRightDamage.png", ImageLocation.JAR);
+		imagePool.loadImage("protagonist", basePath + "pirate.png", ImageLocation.JAR);
+		imagePool.loadImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyWeakLeft", basePath + "enemy_weak_left.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyWeakRight", basePath + "enemy_weak_right.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyWeakLeftDamage", basePath + "enemy_weak_left_damage.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyWeakRightDamage", basePath + "enemy_weak_right_damage.png", ImageLocation.JAR);
+		imagePool.loadImage("apple", basePath + "apple.png", ImageLocation.JAR);
+		imagePool.loadImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
+		imagePool.loadImage("melon", basePath + "melon.png", ImageLocation.JAR);
+		imagePool.loadImage("soda", basePath + "soda.png", ImageLocation.JAR);
+		imagePool.loadImage("butterChicken", basePath + "butter_chicken.png", ImageLocation.JAR);
+		imagePool.loadImage("butterChickenShadow", basePath + "butter_chicken_shadow.png", ImageLocation.JAR);
+		imagePool.loadImage("puddle_s0", basePath + "puddle_s0.png", ImageLocation.JAR);
+		imagePool.loadImage("puddle_s1", basePath + "puddle_s1.png", ImageLocation.JAR);
+		imagePool.loadImage("puddle_s2", basePath + "puddle_s2.png", ImageLocation.JAR);
+		imagePool.loadImage("puddle_s3", basePath + "puddle_s3.png", ImageLocation.JAR);
+		imagePool.loadImage("barrel_s0", basePath + "barrel_s0.png", ImageLocation.JAR);
+		imagePool.loadImage("barrel_s1", basePath + "barrel_s1.png", ImageLocation.JAR);
+		imagePool.loadImage("barrelShadow", basePath + "barrel_shadow.png", ImageLocation.JAR);
 		
 		// Tile setup part
 		this.tiles = genTiles();
@@ -207,9 +214,10 @@ public class Game extends Menu {
 				puddleAmount++;
 			}
 		}
-		if (puddleAmount == 10 && level == 0) {
+		if (puddleAmount == 200 && level == 0) {
 			increaseLevel();
-			playScene(new Scene(this, "Gustavio", "Hey Hey Hey", protRenderer));
+			playScene(new Scene(this, "Gustavo: ", "Wait a minute... Did the ship just sink deeper?", protRenderer));
+			playScene(new Scene(this, "Gustavo: ", "Oh no... what an unintended side effect...", protRenderer));
 		}
 		
 		for (int i = 0; i < enemies.size(); i++) {
@@ -324,10 +332,10 @@ public class Game extends Menu {
 			double y = 0;
 			if (Math.random() >= 0.5) {
 				// Spawn at top
-				y = HEIGHT / 2 + 2;
+				y = HEIGHT / 2 + 0.5;
 			} else {
 				// Spawn at bottom
-				y = - HEIGHT / 2 - 2;
+				y = - HEIGHT / 2 - 0.5;
 			}
 			addEnemy(new Enemy(this, player, x, y));
 		}

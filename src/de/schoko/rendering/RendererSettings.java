@@ -58,8 +58,7 @@ public class RendererSettings {
 	 * @param b Blue Color Amount (Value between 0 and 255)
 	 */
 	public void setBackgroundColor(int r, int g, int b) {
-		float[] color = Color.RGBtoHSB(r, g, b, null);
-		backgroundColor = Color.getHSBColor(color[0], color[1], color[2]);
+		backgroundColor = Graph.getColor(r, g, b);
 	}
 	
 	public boolean isCrashingOnException() {

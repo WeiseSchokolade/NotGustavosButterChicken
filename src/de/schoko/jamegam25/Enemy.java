@@ -3,6 +3,8 @@ package de.schoko.jamegam25;
 import java.util.ArrayList;
 
 import de.schoko.rendering.Graph;
+import de.schoko.rendering.Image;
+import de.schoko.rendering.shapes.ImageFrame;
 import de.schoko.rendering.shapes.Rectangle;
 
 public class Enemy extends GameObject {
@@ -17,12 +19,20 @@ public class Enemy extends GameObject {
 	private double speed = 2;
 	// Stunned is used for the time the enemy is stunned, usually 2000 ms (2 seconds)
 	private double stunned;
+	private ImageFrame drawing;
+	private Image[] images;
 
     public Enemy(Game game, Player player, double x, double y) {
         super(x, y);
 		this.game = game;
 		this.player = player;
 		this.health = 3;
+		this.drawing = new ImageFrame(x, y, game.getContext().getImagePool().getImage("enemyWeak"), 16);
+		images = new Image[] {
+			game.getContext().getImagePool().getImage("enemyWeakLeft"), 
+			game.getContext().getImagePool().getImage("enemyWeakRight"),
+			game.getContext().getImagePool().getImage("enemyWeakLeftDamage"), 
+			game.getContext().getImagePool().getImage("enemyWeakRightDamage")};
     }
 
     @Override
@@ -85,13 +95,28 @@ public class Enemy extends GameObject {
 			}
 		}
 
-		// Rendering
-		g.draw(new Rectangle(x - 0.5, y - 0.5, 1, 1));
-		g.drawString("Health: " + health, this.x - 0.5, this.y + 0.75);
 		if (damaged > 0) {
-			g.draw(new Rectangle(x - 0.5, y - 0.5, 1, 1, Graph.getColor(255, 0, 0, 80)));
 			damaged -= deltaTimeMS;
 		}
+
+		// Rendering
+		if (game.getPlayer().getX() > x) {
+			if (damaged > 0) {
+				drawing.setImage(images[3]);
+			} else {
+				drawing.setImage(images[1]);
+			}
+		} else {
+			if (damaged > 0) {
+				drawing.setImage(images[2]);
+			} else {
+				drawing.setImage(images[0]);
+			}
+		}
+		drawing.setX(x);
+		drawing.setY(y);
+		g.draw(drawing);
+		
 	}
 
 	public boolean isInArea() {

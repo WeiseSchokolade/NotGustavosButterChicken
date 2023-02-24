@@ -11,11 +11,14 @@ import de.schoko.rendering.Context;
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.ImageLocation;
 import de.schoko.rendering.ImagePool;
+import de.schoko.rendering.shapes.ImageFrame;
 
 public class MainMenu extends Menu {
 	private Sound sound;
+	private ImageFrame sign;
 	private Button playButton;
 	private Button skipButton;
+	private Button creditsButton;
 
 	public MainMenu() {
 		super(false);
@@ -26,12 +29,16 @@ public class MainMenu extends Menu {
 		context.getSettings().setBackgroundColor(78, 188, 208);
 
 		ImagePool imagePool = context.getImagePool();
-		imagePool.addImage("button", Project.ASSET_PATH + "button.png", ImageLocation.JAR);
+		imagePool.loadImage("sign", Project.ASSET_PATH + "sign.png", ImageLocation.JAR);
+		imagePool.loadImage("button", Project.ASSET_PATH + "button.png", ImageLocation.JAR);
 
+		sign = new ImageFrame(0, 0.75, imagePool.getImage("sign"), 48);
 		playButton = new Button("Play", 0, 0, 1.5, 0.5, "button", 32, context);
-		skipButton = new Button("Skip", 0, -0.5, 1.5, 0.5, "button", 32, context);
+		skipButton = new Button("Skip Intro", 0, -0.5, 1.5, 0.5, "button", 32, context);
+		creditsButton = new Button("Credits", 0, -1, 1.5, 0.5, "button", 32, context);
 
-		sound = new Sound(this, Project.ASSET_PATH + "menu_song.wav", false);
+		sound = new Sound(this, Project.ASSET_PATH + "menu_song.wav", true);
+		sound.setVolume(0.1);
 		sound.start();
 		
 		context.getCamera().setCameraPath(new CameraPath() {
@@ -59,7 +66,13 @@ public class MainMenu extends Menu {
 			getProject().setMenu(new Game());
 			return;
 		}
+		if (creditsButton.pressed()) {
+			getProject().setMenu(new Credits());
+			return;
+		}
+		g.draw(sign);
 		g.draw(playButton);
 		g.draw(skipButton);
+		g.draw(creditsButton);
 	}
 }

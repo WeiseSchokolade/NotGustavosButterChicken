@@ -9,6 +9,7 @@ public class Window {
 	private SwingWindow swingWindow;
 	private RendererSettings rendererSettings;
 	private Context context;
+	private Image windowIcon;
 	
 	/**
 	 * Creates a new invisible Window with the given titel and renderer object.
@@ -42,6 +43,9 @@ public class Window {
 		
 		// Opens the window and starts the rendering process
 		swingWindow = new SwingWindow(title, panel);
+		if (windowIcon != null) {
+			swingWindow.setIconImage(windowIcon.getAWTImage());
+		}
 	}
 
 	public void openEditPanel(String initialText, ChangeApplier ca) {
@@ -62,5 +66,13 @@ public class Window {
 	
 	protected SwingWindow getSwingWindow() {
 		return swingWindow;
+	}
+	
+	public void setWindowIcon(Image image) {
+		if (swingWindow != null) {
+			swingWindow.setIconImage(image.getAWTImage());
+		} else {
+			windowIcon = image;
+		}
 	}
 }

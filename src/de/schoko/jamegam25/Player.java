@@ -40,10 +40,12 @@ public class Player extends GameObject {
 		this.maxHealth = 3;
 		this.health = maxHealth;
 		this.damage = 1;
-		images = new Image[2];
-		images[0] = context.getImagePool().getImage("playerRight");
-		images[1] = context.getImagePool().getImage("playerLeft");
-
+		images = new Image[] {
+			context.getImagePool().getImage("playerRight"),
+			context.getImagePool().getImage("playerLeft"),
+			context.getImagePool().getImage("playerRightDamage"),
+			context.getImagePool().getImage("playerLeftDamage")
+		};
 		imageFrame = new ImageFrame(x, y, images[0], 16);
 
 		heals = new ArrayList<>();
@@ -163,16 +165,28 @@ public class Player extends GameObject {
 			shootCooldown -= deltaTimeMS;
 		}
 
-		// Drawing Part
-		imageFrame.setX(this.x);
-		imageFrame.setY(this.y);
-		imageFrame.setImage(images[(facingLeft) ? 1 : 0]);
-		g.draw(imageFrame);
-
+		// Damage
 		if (damaged > 0) {
-			// TODO: Damage Visual
 			damaged -= deltaTimeMS;
 		}
+
+		// Rendering
+		imageFrame.setX(this.x);
+		imageFrame.setY(this.y);
+		if (damaged > 0) {
+			if (facingLeft) {
+				imageFrame.setImage(images[3]);
+			} else {
+				imageFrame.setImage(images[2]);
+			}
+		} else {
+			if (facingLeft) {
+				imageFrame.setImage(images[1]);
+			} else {
+				imageFrame.setImage(images[0]);
+			}
+		}
+		g.draw(imageFrame);
 	}
 
 	public void checkKey(int key) {

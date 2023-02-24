@@ -14,7 +14,7 @@ public class Project extends Renderer {
 	public static final String ASSET_PATH = "de/schoko/jamegam25/assets/";
 
 	public static void main(String[] args) {
-		Window window = new Window(new Project(), "Jame Gam 25");
+		Window window = new Window(new Project(), "Not Gustavo's Butter Chicken");
 		window.getSettings().setRenderCoordinateSystem(false);
 		window.getSettings().setDisplayStartedNotification(false);
 		window.open();
@@ -25,7 +25,7 @@ public class Project extends Renderer {
 
 	@Override
 	public void onLoad(Context context) {
-		setMenu(new MainMenu());
+		setMenu(new LoadingMenu());
 	}
 
 	@Override

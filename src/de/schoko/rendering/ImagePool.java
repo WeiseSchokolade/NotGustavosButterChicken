@@ -25,4 +25,10 @@ public class ImagePool {
 	public void addImage(String name, String path, ImageLocation imageLocation) {
 		cache.put(name, new Image(name, imageLocation.getImage(path)));
 	}
+	
+	public void loadImage(String name, String path, ImageLocation imageLocation) {
+		if (!cache.containsKey(name)) {
+			cache.put(name, new Image(name, imageLocation.getImage(path)));
+		}
+	}
 }
