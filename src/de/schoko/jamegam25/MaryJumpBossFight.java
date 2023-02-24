@@ -79,6 +79,8 @@ public class MaryJumpBossFight extends Boss {
 				damaged = true;
 				this.x = targetX;
 				this.y = targetY;
+				Sound sound = new Sound(game, Project.ASSET_PATH + "stomp.wav", false);
+				sound.start();
 				if (distanceTo(game.getPlayer()) < radius) {
 					game.getPlayer().applyDamage(Double.MAX_VALUE);
 				}

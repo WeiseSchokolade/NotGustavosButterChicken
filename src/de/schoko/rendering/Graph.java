@@ -188,6 +188,12 @@ public class Graph {
 		g2D.setColor(c);
 		g2D.drawRect(convSX(x0), convSY(y1), convSW(x1 - x0), convSH(y1 - y0));
 	}
+	
+	// TODO: Implement this into renderering engine
+	public void fillRect(double x0, double y0, double x1, double y1, Color c) {
+		g2D.setColor(c);
+		g2D.fillRect(convSX(x0), convSY(y1), convSW(x1 - x0), convSH(y1 - y0));
+	}
 
 	public void drawImage(Image image, double x, double y, double scale) {
 		int imgWidth = (int) convSW(image.getWidth(null) / scale);

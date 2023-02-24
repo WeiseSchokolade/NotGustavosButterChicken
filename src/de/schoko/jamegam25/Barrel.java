@@ -29,12 +29,12 @@ public class Barrel extends GameObject {
 	public void render(Graph g, double deltaTimeMS) {
 		if (right) {
 			this.x += deltaTimeMS / 1000 * speed;
-			if (this.x > this.game.getTiles().length / 2) {
+			if (this.x > this.game.getWidth() / 2 + 2) {
 				this.remove();
 			}
 		} else {
 			this.x -= deltaTimeMS / 1000 * speed;
-			if (this.x < -this.game.getTiles().length / 2) {
+			if (this.x < -this.game.getWidth() / 2 - 2) {
 				this.remove();
 			}
 		}

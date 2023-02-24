@@ -20,6 +20,8 @@ public class MainMenu extends Menu {
 	private Button skipButton;
 	private boolean skipButtonPressed;
 	private Button creditsButton;
+	private Button aboutButton;
+	private boolean aboutButtonPressed;
 
 	public MainMenu() {
 		super(false);
@@ -37,6 +39,7 @@ public class MainMenu extends Menu {
 		playButton = new Button("Play", 0, 0, 1.5, 0.5, "button", 32, context);
 		skipButton = new Button("Skip Intro", 0, -0.5, 1.5, 0.5, "button", 32, context);
 		creditsButton = new Button("Credits", 0, -1, 1.5, 0.5, "button", 32, context);
+		aboutButton = new Button("About", 0, -1.5, 1.5, 0.5, "button", 32, context);
 
 		sound = new Sound(this, Project.ASSET_PATH + "menu_song.wav", true);
 		sound.setVolume(0.1);
@@ -65,15 +68,22 @@ public class MainMenu extends Menu {
 		}
 		if (skipButtonPressed && !skipButton.pressed()) {
 			getProject().setMenu(new Game());
+			return;
 		}
 		skipButtonPressed = (skipButton.pressed());
 		if (creditsButton.pressed()) {
 			getProject().setMenu(new Credits());
 			return;
 		}
+		if (aboutButtonPressed && !aboutButton.pressed()) {
+			getProject().setMenu(new AboutMenu());
+			return;
+		}
+		aboutButtonPressed = aboutButton.pressed();
 		g.draw(sign);
 		g.draw(playButton);
 		g.draw(skipButton);
 		g.draw(creditsButton);
+		g.draw(aboutButton);
 	}
 }

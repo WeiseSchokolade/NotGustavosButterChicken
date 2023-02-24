@@ -65,7 +65,8 @@ public class Game extends Menu {
 		ImagePool imagePool = context.getImagePool();
 		imagePool.loadImage("tile", basePath + "tile.png", ImageLocation.JAR);
 		imagePool.loadImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
-		imagePool.loadImage("tileHandrail", basePath + "tile_handrail.png", ImageLocation.JAR);
+		imagePool.loadImage("tileHandrailLeft", basePath + "tile_handrail_left.png", ImageLocation.JAR);
+		imagePool.loadImage("tileHandrailRight", basePath + "tile_handrail_right.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallLeftFront", basePath + "wall_left_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTopLeftFront", basePath + "wall_top_left_front.png", ImageLocation.JAR);
@@ -81,7 +82,9 @@ public class Game extends Menu {
 		imagePool.loadImage("wallHandrail", basePath + "wall_handrail.png", ImageLocation.JAR);
 		imagePool.loadImage("slope1", basePath + "slope_1.png", ImageLocation.JAR);
 		imagePool.loadImage("slope2", basePath + "slope_2.png", ImageLocation.JAR);
-		imagePool.loadImage("handrailCorner", basePath + "handrail_corner.png", ImageLocation.JAR);
+		imagePool.loadImage("slopeCorner", basePath + "slope_corner.png", ImageLocation.JAR);
+		imagePool.loadImage("handrailCornerLeft", basePath + "handrail_corner_left.png", ImageLocation.JAR);
+		imagePool.loadImage("handrailCornerRight", basePath + "handrail_corner_right.png", ImageLocation.JAR);
 		imagePool.loadImage("handrailFree", basePath + "handrail_free.png", ImageLocation.JAR);
 		imagePool.loadImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.loadImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
@@ -239,12 +242,12 @@ public class Game extends Menu {
 				puddleAmount++;
 			}
 		}
-		if (puddleAmount == 125 && level == 0) {
+		if (puddleAmount >= 125 && level == 0) {
 			increaseLevel();
 			playScene(new Scene(this, "Gustavo: ", "Wait a minute... Did the ship just sink deeper?", protRenderer));
 			playScene(new Scene(this, "Gustavo: ", "Oh no... what an unintended side effect...", protRenderer));
 		}
-		if (puddleAmount == 250 && level == 1) {
+		if (puddleAmount >= 250 && level == 1) {
 			increaseLevel();
 		}
 		
@@ -377,7 +380,6 @@ public class Game extends Menu {
 		}
 	}
 
-	// TODO: Implement actual ship sinking (Game Over)
 	// Makes ship heavier so it will be lower in the water and eventually sink
 	public void increaseLevel() {
 		level++;
@@ -387,27 +389,32 @@ public class Game extends Menu {
 					tiles[x][y] = null;
 				}
 				if (y == level) {
+					if (tiles[x][y] == null) continue;
 					tiles[x][y].setShape(getWaterWallTile());
 				}
 			}
 		}
+		if (level >= 2) {
+			getProject().setMenu(new GameOverSink(this));
+		}
 	}
 
 	public Tile[][] genTiles() {
-		Tile[][] tiles = new Tile[WIDTH + 2 + 25][HEIGHT + 2 + 8];
+		Tile[][] tiles = new Tile[WIDTH + 2 + 20][HEIGHT + 2 + 8];
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				String img = "tile";
-				if (x > tiles.length - 10) {
+				int rsWidth = 7;
+				if (x > tiles.length - rsWidth) {
 					if (y < 6) {
 						img = "wallTileFront";
 						if (y > 3) {
-							if (x == tiles.length - 9) {
+							if (x == tiles.length - rsWidth + 1) {
 								img = "wallLeftFront";
 							}
 						}
 					} else if (y == 6) {
-						if (x == tiles.length - 9) {
+						if (x == tiles.length - rsWidth + 1) {
 							img = "wallTopLeftFront";
 						} else {
 							img = "wallTopFront";
@@ -416,16 +423,36 @@ public class Game extends Menu {
 						img = "wallHandrail";
 					} else if (y > 7) {
 						if (y == tiles[0].length - 1) {
-							if (x == tiles.length - 9) {
-								img = "handrailCorner";
+							if (x == tiles.length - rsWidth + 1) {
+								img = "handrailCornerLeft";
+							} else if (x == tiles.length - 1) {
+								img = "handrailCornerRight";
 							} else {
 								img = "handrailFree";
 							}
 						} else {
-							if (x == tiles.length - 9) {
-								img = "tileHandrail";
+							if (x == tiles.length - rsWidth + 1) {
+								img = "tileHandrailLeft";
+							}
+							if (x == tiles.length - 1) {
+								img = "tileHandrailRight";
 							}
 						}
+					}
+					if (y < 7) {
+						if (x - tiles.length + rsWidth - 3 - 0.5 * y == 0) {
+							if (x == tiles.length - 1 && y == 6) {
+								img = "slopeCorner";
+							} else {
+								img = "slope1";
+							}
+						}
+						if ((x > tiles.length - 8) && x - tiles.length + rsWidth - 3 - 0.5 * (y - 1) == 0) {
+							img = "slope2";
+						}
+					}
+					if (y < 8 && x - tiles.length + rsWidth - 3 - 0.5 * y > 0) {
+						img = null;
 					}
 				} else if (x < 6) {
 					if (y < 6) {
@@ -446,13 +473,18 @@ public class Game extends Menu {
 					} else if (y > 7) {
 						if (y == tiles[0].length - 1) {
 							if (x == 5) {
-								img = "handrailCorner";
+								img = "handrailCornerRight";
+							} else if (x == 0) {
+								img = "handrailCornerLeft";
 							} else {
 								img = "handrailFree";
 							}
 						} else {
 							if (x == 5) {
-								img = "tileHandrail";
+								img = "tileHandrailRight";
+							}
+							if (x == 0) {
+								img = "tileHandrailLeft";
 							}
 						}
 					}
@@ -471,10 +503,11 @@ public class Game extends Menu {
 				} else if (y == tiles[x].length - 4) {
 					img = "wallTopBack";
 				}
-				if (y == 0) {
+				if (y == 0 && img != null) {
 					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
 					continue;
 				}
+				if (img == null) continue;
 				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getContext().getImagePool().getImage(img), TILE_SIZE);
 			}
 		}

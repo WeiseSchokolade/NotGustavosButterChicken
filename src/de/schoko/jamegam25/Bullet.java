@@ -17,7 +17,7 @@ public class Bullet extends GameObject{
 	private double dHeight; // change of height
 
 	public Bullet(double x, double y, double direction, double damage, Game game) {
-		super(x, y);
+		super(x, y, 50);
 		this.game = game;
 		this.enemies = game.getEnemies();
 		this.drawing = new ImageFrame(x, y, game.getContext().getImagePool().getImage("butterChicken"), 32);
