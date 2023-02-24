@@ -65,9 +65,12 @@ public class Game extends Menu {
 		ImagePool imagePool = context.getImagePool();
 		imagePool.loadImage("tile", basePath + "tile.png", ImageLocation.JAR);
 		imagePool.loadImage("tileHole", basePath + "tileHole.png", ImageLocation.JAR);
+		imagePool.loadImage("tileHandrail", basePath + "tile_handrail.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTopFront", basePath + "wall_top_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallLeftFront", basePath + "wall_left_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTopLeftFront", basePath + "wall_top_left_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallRightFront", basePath + "wall_right_front.png", ImageLocation.JAR);
+		imagePool.loadImage("wallTopRightFront", basePath + "wall_top_right_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTileFront", basePath + "wall_tile_front.png", ImageLocation.JAR);
 		imagePool.loadImage("wallTopBack", basePath + "wall_top_back.png", ImageLocation.JAR);
 		imagePool.loadImage("wallWater0", basePath + "wallWater_0.png", ImageLocation.JAR);
@@ -75,6 +78,11 @@ public class Game extends Menu {
 		imagePool.loadImage("wallWater2", basePath + "wallWater_2.png", ImageLocation.JAR);
 		imagePool.loadImage("wallBullseye", basePath + "wallBullseye.png", ImageLocation.JAR);
 		imagePool.loadImage("wallCannon", basePath + "wallCannon.png", ImageLocation.JAR);
+		imagePool.loadImage("wallHandrail", basePath + "wall_handrail.png", ImageLocation.JAR);
+		imagePool.loadImage("slope1", basePath + "slope_1.png", ImageLocation.JAR);
+		imagePool.loadImage("slope2", basePath + "slope_2.png", ImageLocation.JAR);
+		imagePool.loadImage("handrailCorner", basePath + "handrail_corner.png", ImageLocation.JAR);
+		imagePool.loadImage("handrailFree", basePath + "handrail_free.png", ImageLocation.JAR);
 		imagePool.loadImage("playerLeft", basePath + "playerLeft.png", ImageLocation.JAR);
 		imagePool.loadImage("playerRight", basePath + "playerRight.png", ImageLocation.JAR);
 		imagePool.loadImage("playerLeftDamage", basePath + "playerLeftDamage.png", ImageLocation.JAR);
@@ -386,23 +394,66 @@ public class Game extends Menu {
 	}
 
 	public Tile[][] genTiles() {
-		Tile[][] tiles = new Tile[WIDTH + 2 + 12][HEIGHT + 2 + 8];
+		Tile[][] tiles = new Tile[WIDTH + 2 + 25][HEIGHT + 2 + 8];
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				String img = "tile";
-				if (x > tiles.length - 6) {
+				if (x > tiles.length - 10) {
 					if (y < 6) {
 						img = "wallTileFront";
 						if (y > 3) {
-							if (x == tiles.length - 5) {
+							if (x == tiles.length - 9) {
 								img = "wallLeftFront";
 							}
 						}
 					} else if (y == 6) {
-						if (x == tiles.length - 5) {
+						if (x == tiles.length - 9) {
 							img = "wallTopLeftFront";
 						} else {
 							img = "wallTopFront";
+						}
+					} else if (y == 7) {
+						img = "wallHandrail";
+					} else if (y > 7) {
+						if (y == tiles[0].length - 1) {
+							if (x == tiles.length - 9) {
+								img = "handrailCorner";
+							} else {
+								img = "handrailFree";
+							}
+						} else {
+							if (x == tiles.length - 9) {
+								img = "tileHandrail";
+							}
+						}
+					}
+				} else if (x < 6) {
+					if (y < 6) {
+						img = "wallTileFront";
+						if (y > 3) {
+							if (x == 5) {
+								img = "wallRightFront";
+							}
+						}
+					} else if (y == 6) {
+						if (x == 5) {
+							img = "wallTopRightFront";
+						} else {
+							img = "wallTopFront";
+						}
+					} else if (y == 7) {
+						img = "wallHandrail";
+					} else if (y > 7) {
+						if (y == tiles[0].length - 1) {
+							if (x == 5) {
+								img = "handrailCorner";
+							} else {
+								img = "handrailFree";
+							}
+						} else {
+							if (x == 5) {
+								img = "tileHandrail";
+							}
 						}
 					}
 				} else if (y == 2 &&
