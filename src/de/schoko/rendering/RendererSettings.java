@@ -7,6 +7,7 @@ public class RendererSettings {
 	private Color backgroundColor;
 	private boolean crashOnException;
 	private boolean displayStartedNotification;
+	private boolean maximizedByDefault;
 	private boolean renderCoordinateSystem;
 	
 	protected RendererSettings() {
@@ -79,5 +80,17 @@ public class RendererSettings {
 	 */
 	public void setDisplayStartedNotification(boolean displayStartedNotification) {
 		this.displayStartedNotification = displayStartedNotification;
+	}
+	
+	public boolean isMaximizedByDefault() {
+		return maximizedByDefault;
+	}
+	
+	/**
+	 * Maximizes the window after it opens. Defaults to false
+	 * @param maximizedByDefault Whether to maximize the window.
+	 */
+	public void setMaximizedByDefault(boolean maximizedByDefault) {
+		this.maximizedByDefault = maximizedByDefault;
 	}
 }

@@ -3,6 +3,10 @@ package de.schoko.jamegam25;
 import java.awt.Color;
 import java.awt.Font;
 
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Clipboard;
+import java.awt.Toolkit;
+
 import de.schoko.jamegam25.shapes.Button;
 import de.schoko.rendering.Camera;
 import de.schoko.rendering.CameraPath;
@@ -15,6 +19,7 @@ import de.schoko.rendering.ImagePool;
 import de.schoko.rendering.shapes.ImageFrame;
 
 public class GameOverDead extends Menu {
+	private Game game;
 	private Tile[][] tiles;
 	private ImageFrame protagonist;
 	private ImageFrame hat;
@@ -22,10 +27,16 @@ public class GameOverDead extends Menu {
 	private boolean fading;
 	private double fade;
 	private Button mainMenuButton;
-
+	private boolean mainMenuButtonPressed;
+	private Button creditsButton;
+	private boolean creditsButtonPressed;
+	private Button copyResultsButton;
+	private boolean copiedResults;
+	
 	public GameOverDead(Game game) {
 		super(true);
-		tiles = game.genTiles();
+		this.game = game;
+		this.tiles = game.genTiles();
 	}
 
 	@Override
@@ -70,19 +81,59 @@ public class GameOverDead extends Menu {
 					return new CameraPathPoint(0, 0, 75);
 				});
 				getContext().getSettings().setBackgroundColor(0, 0, 0);
-				mainMenuButton = new Button("Main Menu", 0, -2, 1.5, 0.75, "button", 16, getContext());
+				mainMenuButton = new Button("Main Menu", 0, -1, 3, 0.8, "button", 16, getContext());
+				creditsButton = new Button("Credits", 0, -2, 3, 0.8, "button", 16, getContext());
+				copyResultsButton = new Button("Copy Results", 0, -3, 3, 0.8, "button", 16, getContext());				
 			}
 			g.draw(mainMenuButton);
+			g.draw(creditsButton);
+			g.draw(copyResultsButton);
 
-			if (mainMenuButton.pressed()) {
+			if (mainMenuButtonPressed && !mainMenuButton.pressed()) {
 				getProject().setMenu(new MainMenu());
 				return;
 			}
-
+			mainMenuButtonPressed = mainMenuButton.pressed();
+			if (creditsButtonPressed && !creditsButton.pressed()) {
+				getProject().setMenu(new Credits());
+				return;
+			}
+			creditsButtonPressed = creditsButton.pressed();
+			
 			String text = "GAME OVER";
 			Font font = new Font("Consolas", Font.BOLD, 50);
 			double textWidth = Graph.getStringWidth(text, font);
 			hud.drawText("GAME OVER", hud.getWidth() / 2 - textWidth / 2, hud.getHeight() / 2, Color.RED, font);
+
+			font = new Font("Segoe UI", Font.PLAIN, 20);
+			hud.drawText("Defeated Enemies: " + game.getTotalKilledEnemyAmount(), 5, hud.getHeight() - 70, Color.WHITE, font);
+			
+			String time = "";
+			double totalTime = game.getTotalTime();
+			int hours = (int) Math.floor(totalTime / 3600);
+			if (hours != 0) {
+				time += "" + hours + ":";
+			}
+			int minutes = (int) Math.floor((totalTime / 60) % 60);
+			int seconds = (int) Math.floor(totalTime % 60);
+			time += "" + minutes + ":";
+			time += "" + seconds + "";
+			hud.drawText("Time: " + time, 5, hud.getHeight() - 50, Color.WHITE, font);
+
+			hud.drawText("Puddles: " + game.getTotalPuddleAmount(), 5, hud.getHeight() - 30, Color.WHITE, font);
+
+			if (copyResultsButton.pressed()) {
+				if (!copiedResults) {
+					copyToClipboard("Not Gustavo's Butter Chicken\nDefeated Enemies: " + game.getTotalKilledEnemyAmount() + "\nTime: " + time + "\nPuddles: " + game.getTotalPuddleAmount());
+					copiedResults = true;
+				}
+				copyResultsButton.setText("Copied to Clipboard");		
+				
+			} else {
+				copyResultsButton.setText("Copy Results");
+				copiedResults = false;
+			}
+
 
 			return; // Return because we don't need to render the other stuff
 		}
@@ -104,5 +155,10 @@ public class GameOverDead extends Menu {
 			hud.drawRect(0, 0, hud.getWidth(), hud.getHeight(), Graph.getColor(0, 0, 0, alpha));
 			fade += deltaTimeMS / 1000;
 		}
+	}
+
+	public void copyToClipboard(String text) {
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(new StringSelection(text), null);
 	}
 }

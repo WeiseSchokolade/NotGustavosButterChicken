@@ -18,6 +18,7 @@ public class MainMenu extends Menu {
 	private ImageFrame sign;
 	private Button playButton;
 	private Button skipButton;
+	private boolean skipButtonPressed;
 	private Button creditsButton;
 
 	public MainMenu() {
@@ -62,10 +63,10 @@ public class MainMenu extends Menu {
 			getProject().setMenu(new IntroMenu());
 			return;
 		}
-		if (skipButton.pressed()) {
+		if (skipButtonPressed && !skipButton.pressed()) {
 			getProject().setMenu(new Game());
-			return;
 		}
+		skipButtonPressed = (skipButton.pressed());
 		if (creditsButton.pressed()) {
 			getProject().setMenu(new Credits());
 			return;

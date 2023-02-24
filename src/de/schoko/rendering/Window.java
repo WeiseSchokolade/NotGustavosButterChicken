@@ -43,6 +43,9 @@ public class Window {
 		
 		// Opens the window and starts the rendering process
 		swingWindow = new SwingWindow(title, panel);
+		if (rendererSettings.isMaximizedByDefault()) {
+			swingWindow.setExtendedState(swingWindow.getExtendedState() | SwingWindow.MAXIMIZED_BOTH);
+		}
 		if (windowIcon != null) {
 			swingWindow.setIconImage(windowIcon.getAWTImage());
 		}

@@ -163,6 +163,18 @@ public class Graph {
 		g2D.drawArc(convSX(x - radius / 2), convSY(y + radius / 2), convSW(radius), convSH(radius), 0, 360);
 	}
 	
+	/**
+	 * Fills a circle
+	 * @param x coordinate of center
+	 * @param y coordinate of center
+	 * @param c Color of circle
+	 * @param radius Radius of circle
+	 */
+	public void fillCircle(double x, double y, Color c, double radius) {
+		g2D.setColor(c);
+		g2D.fillArc(convSX(x - radius / 2), convSY(y + radius / 2), convSW(radius), convSH(radius), 0, 360);
+	}
+	
 	public void drawLine(double x0, double y0, double x1, double y1, Color c) {
 		g2D.setColor(c);
 		g2D.drawLine(convSX(x0), convSY(y0), convSX(x1), convSY(y1));

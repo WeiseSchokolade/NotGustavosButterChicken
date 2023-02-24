@@ -1,6 +1,9 @@
 package de.schoko.jamegam25;
 
 import java.awt.Font;
+
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 
 import de.schoko.rendering.Context;
@@ -17,6 +20,7 @@ public class Project extends Renderer {
 		Window window = new Window(new Project(), "Not Gustavo's Butter Chicken");
 		window.getSettings().setRenderCoordinateSystem(false);
 		window.getSettings().setDisplayStartedNotification(false);
+		window.getSettings().setMaximizedByDefault(true);
 		window.open();
 	}
 
@@ -41,7 +45,15 @@ public class Project extends Renderer {
 			}
 		}
 		if (!paused) {
-			menu.render(g, deltaTimeMS);
+			try {
+				menu.render(g, deltaTimeMS);
+			} catch (Exception e) {
+				e.printStackTrace();				
+				int result = JOptionPane.showConfirmDialog(null, "An exception occured:\n" + e.getMessage() + "\n Continue?", "Exception", JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.NO_OPTION) {
+					System.exit(0);
+				}
+			}
 		} else {
 			String text = "Your game is paused. Press ESCAPE to unpause.";
 			Font font = new Font("Segoe UI", Font.PLAIN, 15);
@@ -60,5 +72,14 @@ public class Project extends Renderer {
 		this.menu.setContext(getContext());
 		this.menu.setProject(this);
 		this.menu.onLoad(getContext());
+	}
+
+	// This method is used to open a menu that has been open before (The onLoad has already been called)
+	public void returnToMenu(Menu menu) {
+		if (this.menu != null) {
+			this.menu.onLeave(getContext());
+			this.menu.stopSounds();
+		}
+		this.menu = menu;
 	}
 }

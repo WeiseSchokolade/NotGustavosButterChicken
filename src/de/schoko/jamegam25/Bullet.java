@@ -7,7 +7,7 @@ import de.schoko.rendering.shapes.ImageFrame;
 
 public class Bullet extends GameObject{
 	private Game game;
-	private ArrayList<Enemy> enemies;
+	private ArrayList<GameObject> enemies;
 	private ImageFrame drawing;
 	private ImageFrame shadow;
 	private double direction;
@@ -44,9 +44,14 @@ public class Bullet extends GameObject{
 		}
 
 		for (int i = 0; i < enemies.size(); i++) {
-			Enemy enemy = enemies.get(i);
+			GameObject enemy = enemies.get(i);
 			if (distanceTo(enemy) < 0.5) {
-				enemy.applyDamage(this.damage);
+				if (enemy instanceof Enemy) {
+					((Enemy) enemy).applyDamage(this.damage);
+				}
+				if (enemy instanceof StrongEnemy) {
+					((StrongEnemy) enemy).applyDamage(this.damage);
+				}
 				this.remove();
 			}
 		}

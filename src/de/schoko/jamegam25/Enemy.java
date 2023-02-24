@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import de.schoko.rendering.Graph;
 import de.schoko.rendering.Image;
 import de.schoko.rendering.shapes.ImageFrame;
-import de.schoko.rendering.shapes.Rectangle;
 
 public class Enemy extends GameObject {
 	private Game game;

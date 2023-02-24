@@ -12,40 +12,8 @@ import de.schoko.rendering.Keyboard;
 import de.schoko.rendering.Image;
 
 public class Credits extends Menu {
-	private static final String creditString = """
-		Thank you for playing!
+	private static final String creditString = "Thank you for playing!\n\n- Credits -\n\nDirector: WeiseSchokolade\n\nProgramming: WeiseSchokolade, wuaht\nDesign: wuaht, WeiseSchokolade\nMusic: Demaon, Namikah, WeiseSchokolade\nSynchro (Not Implemented): Demaon, Namikah\n\nTeam: Demaon, Wuaht, Namikah, WeiseSchokolade\n\nMade For Jame Gam #25\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThank you for playing!	";
 
-		- Credits -
-		
-		Director: WeiseSchokolade
-		
-		Programming: WeiseSchokolade, wuaht
-		Design: wuaht, WeiseSchokolade
-		Music: Demaon, Namikah, WeiseSchokolade
-		Synchro (Not Implemented): Demaon, Namikah
-
-		Team: Demaon, Wuaht, Namikah, WeiseSchokolade
-
-		Made For Jame Gam #25
-
-
-
-
-
-
-
-
-
-
-		
-		
-		
-		
-		
-		
-		Thank you for playing!
-	""";
-	
 	private String[] credits;
 
 	private double t;
@@ -80,11 +48,12 @@ public class Credits extends Menu {
 		for (int i = 0; i < credits.length; i++) {
 			drawCenteredText(credits[i], hud, i * 25 - t);
 		}
+		drawRightAlignedText(hud.getWidth(), hud.getHeight(), "Space to Scroll; Escape to Close", hud);
 		double scale = 0.5;
 		double width = sign.getAWTImage().getWidth(null) / scale;
 		hud.drawImage(hud.getWidth() / 2 - width / 2, hud.getHeight() - 80 - t, sign, scale);
 		
-		if (hud.getHeight() + 20 + (credits.length * 25 - t) < 0) {
+		if (hud.getHeight() + 20 + (credits.length * 25 - t) < 0 || getContext().getKeyboard().isPressed(Keyboard.ESCAPE)) {
 			getProject().setMenu(new MainMenu());
 		}
 	}
@@ -93,5 +62,11 @@ public class Credits extends Menu {
 		Font font = new Font("Consolas", Font.BOLD, 20);
 		double textWidth = Graph.getStringWidth(text, font);
 		hud.drawText(text, hud.getWidth() / 2 - textWidth / 2, hud.getHeight() + 20 + offset, Color.WHITE, font);
+	}
+
+	public void drawRightAlignedText(double x, double y, String text, HUDGraph hud) {
+		Font font = new Font("Consolas", Font.BOLD, 20);
+		double textWidth = Graph.getStringWidth(text, font);
+		hud.drawText(text, x - textWidth - 5, y - 5, Color.GRAY, font);
 	}
 }

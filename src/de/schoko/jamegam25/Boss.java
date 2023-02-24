@@ -12,9 +12,17 @@ public abstract class Boss {
 	}
 
 	public static Boss getRandom(Game game) {
-		Boss[] bossFights = new Boss[1];
-		bossFights[0] = new TestBossFight(game);
-		return bossFights[(int) (Math.floor(Math.random() * bossFights.length))];
+		int random = (int) Math.floor(Math.random() * 3);
+		switch (random) {
+			case 0:
+				return new MaryJumpBossFight(game);
+			case 1: 
+				return new EnemyBossFight(game);
+			case 2:
+				return new BarrelBossFight(game);
+			default:
+				return null; // This case should never occure
+		}
 	}
 
 	public abstract void render(Graph g, double deltaTimeMS);

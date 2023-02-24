@@ -30,7 +30,7 @@ public class Game extends Menu {
 	private Player player;
 	private Tile[][] tiles;
 	private ArrayList<GameObject> gameObjects;
-	private ArrayList<Enemy> enemies;
+	private ArrayList<GameObject> enemies;
 	
 	private int waveEnemyAmount;
 	private int enemyLevel;
@@ -44,6 +44,10 @@ public class Game extends Menu {
 	private ArrayList<Scene> pendingScenes;
 	private Scene currentScene;
 
+	private int totalKilledEnemyAmount;
+	private double totalTime;
+	private int totalPuddleAmount;
+
 	public Game() {
 		super(true);
 	}
@@ -55,7 +59,6 @@ public class Game extends Menu {
 		this.enemies = new ArrayList<>();
 		this.inventory = new InventoryItem[4];
 		this.pendingScenes = new ArrayList<>();
-		wave = 1;
 
 		// Loading Stuff
 		String basePath = Project.ASSET_PATH;
@@ -78,10 +81,15 @@ public class Game extends Menu {
 		imagePool.loadImage("playerRightDamage", basePath + "playerRightDamage.png", ImageLocation.JAR);
 		imagePool.loadImage("protagonist", basePath + "pirate.png", ImageLocation.JAR);
 		imagePool.loadImage("antagonist", basePath + "antagonist.png", ImageLocation.JAR);
+		imagePool.loadImage("strongEnemy", basePath + "enemy_weak_left.png", ImageLocation.JAR);
 		imagePool.loadImage("enemyWeakLeft", basePath + "enemy_weak_left.png", ImageLocation.JAR);
 		imagePool.loadImage("enemyWeakRight", basePath + "enemy_weak_right.png", ImageLocation.JAR);
 		imagePool.loadImage("enemyWeakLeftDamage", basePath + "enemy_weak_left_damage.png", ImageLocation.JAR);
 		imagePool.loadImage("enemyWeakRightDamage", basePath + "enemy_weak_right_damage.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyStrongLeft", basePath + "enemy_strong_left.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyStrongRight", basePath + "enemy_strong_right.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyStrongLeftDamage", basePath + "enemy_strong_left_damage.png", ImageLocation.JAR);
+		imagePool.loadImage("enemyStrongRightDamage", basePath + "enemy_strong_right_damage.png", ImageLocation.JAR);
 		imagePool.loadImage("apple", basePath + "apple.png", ImageLocation.JAR);
 		imagePool.loadImage("chilli", basePath + "chilli.png", ImageLocation.JAR);
 		imagePool.loadImage("melon", basePath + "melon.png", ImageLocation.JAR);
@@ -136,6 +144,10 @@ public class Game extends Menu {
 
 		// Object Creation
 		player = new Player(this, context, 0, 0);
+
+		playScene(new Scene(this, "Gustavo: ", "This soup is hot, maybe I can throw it using the left mouse button.", protRenderer));
+		playScene(new Scene(this, "Gustavo: ", "Oh no, I did not intend the side effect: I should not step into the puddles.", protRenderer));
+		playScene(new Scene(this, "Gustavo: ", "Maybe I can also walk around using WASD/↑←↓→", protRenderer));
 	}
 
 	@Override
@@ -144,32 +156,29 @@ public class Game extends Menu {
 		Keyboard keyboard = getContext().getKeyboard();
 		Mouse mouse = getContext().getMouse();
 
-		// TODO: DEBUG, remove later
-		if (keyboard.wasRecentlyPressed(Keyboard.F2)) {
-			if (enemies.size() > 0) {
-				for (int i = 0; i < enemies.size(); i++) {
-					enemies.get(i).remove();
-				}
-			} else {
-				if (waveCooldown > 0) {
-					waveCooldown = 0;
-				}
-			}
-		}
-		if (keyboard.wasRecentlyPressed(Keyboard.F3)) {
-			getProject().setMenu(new GameOverDead(this));
-		}
+		// Stats part
+		totalTime += deltaTimeMS / 1000;
 
 		// Wave Part
-		if (wave % BOSS_FREQUENCY != 0) {
+
+		if (wave == 0 && currentScene != null) {
+			waveCooldown = 5000;
+		}
+
+		if (wave % BOSS_FREQUENCY != 0 || wave == 0) {
 			if (waveCooldown > 0) {
 				waveCooldown -= deltaTimeMS;
 			} else {
 				if (enemies.size() > 0) {
 					// There are already enemies
 
-					enemies.removeIf((Enemy enemy) -> {
-						return enemy.isRemoved();
+					enemies.removeIf((GameObject enemy) -> {
+						if (enemy.isRemoved()) {
+							totalKilledEnemyAmount++;
+							return true;
+						} else {
+							return false;
+						}
 					});
 
 					if (enemies.size() == 0) {
@@ -191,6 +200,14 @@ public class Game extends Menu {
 				wave++;
 				bossFight = null;
 			}
+			enemies.removeIf((GameObject enemy) -> {
+				if (enemy.isRemoved()) {
+					totalKilledEnemyAmount++;
+					return true;
+				} else {
+					return false;
+				}
+			});
 		}
 
 		// Game Object Stuff
@@ -214,10 +231,13 @@ public class Game extends Menu {
 				puddleAmount++;
 			}
 		}
-		if (puddleAmount == 200 && level == 0) {
+		if (puddleAmount == 125 && level == 0) {
 			increaseLevel();
 			playScene(new Scene(this, "Gustavo: ", "Wait a minute... Did the ship just sink deeper?", protRenderer));
 			playScene(new Scene(this, "Gustavo: ", "Oh no... what an unintended side effect...", protRenderer));
+		}
+		if (puddleAmount == 250 && level == 1) {
+			increaseLevel();
 		}
 		
 		for (int i = 0; i < enemies.size(); i++) {
@@ -309,6 +329,9 @@ public class Game extends Menu {
 		hud.drawText("Wave: " + wave, 5, 25, Color.RED, new Font("Segoe UI", Font.BOLD, 25));
 		
 		// Wave Bar Part
+		if (wave == 0) {
+			waveEnemyAmount = 1;
+		}
 		double perc = enemies.size() / waveEnemyAmount;
 		String title = "Enemies: " + enemies.size() + " / " + waveEnemyAmount;
 		if (waveCooldown > 0) {
@@ -318,6 +341,11 @@ public class Game extends Menu {
 		if (bossFight != null) {
 			// Boss wave
 			title = bossFight.getName();
+			perc = bossFight.getProgress();
+		}
+		if (wave == 0) {
+			perc = 1;
+			title = "Wave Coming";
 		}
 		hud.drawBar(5, 38.5, 100, 15, perc, Graph.getColor(177, 0, 150), Graph.getColor(127, 0, 100));
 		hud.drawText(title, 10, 50, Color.BLACK, new Font("Segoe UI", Font.PLAIN, 12));
@@ -419,10 +447,11 @@ public class Game extends Menu {
 	}
 
 	public void addObject(GameObject gameObject) {
+		if (gameObject instanceof Puddle) totalPuddleAmount++;
 		this.gameObjects.add(gameObject);
 	}
 
-	public void addEnemy(Enemy enemy) {
+	public void addEnemy(GameObject enemy) {
 		this.enemies.add(enemy);
 	}
 
@@ -441,7 +470,7 @@ public class Game extends Menu {
 						new AnimatedImage(getContext().getImagePool().getImage("wallWater2"), 500));
 	}
 
-	public ArrayList<Enemy> getEnemies() {
+	public ArrayList<GameObject> getEnemies() {
 		return enemies;
 	}
 
@@ -467,5 +496,17 @@ public class Game extends Menu {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	public int getTotalKilledEnemyAmount() {
+		return totalKilledEnemyAmount;
+	}
+
+	public double getTotalTime() {
+		return totalTime;
+	}
+
+	public int getTotalPuddleAmount() {
+		return totalPuddleAmount;
 	}
 }

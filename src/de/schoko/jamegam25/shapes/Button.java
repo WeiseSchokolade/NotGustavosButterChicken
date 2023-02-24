@@ -39,6 +39,10 @@ public class Button extends Shape {
 		return (touching() && mouse.isPressed(Mouse.LEFT_BUTTON));
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+
 	@Override
 	public void render(Graph g) {
 		Font font = new Font("Segoe UI", Font.BOLD, 20);
