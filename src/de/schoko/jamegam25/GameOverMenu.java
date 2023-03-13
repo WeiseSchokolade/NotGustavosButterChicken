@@ -85,10 +85,11 @@ public class GameOverMenu extends Menu {
 		hud.drawText("Time: " + time, 5, hud.getHeight() - 50, Color.WHITE, font);
 
 		hud.drawText("Puddles: " + game.getTotalPuddleAmount(), 5, hud.getHeight() - 30, Color.WHITE, font);
+		hud.drawText("Wave: " + game.getWave(), 5, hud.getHeight() - 10, Color.WHITE, font);
 
 		if (copyResultsButton.pressed()) {
 			if (!copiedResults) {
-				copyToClipboard("Not Gustavo's Butter Chicken\nDefeated Enemies: " + game.getTotalKilledEnemyAmount() + "\nTime: " + time + "\nPuddles: " + game.getTotalPuddleAmount());
+				copyToClipboard("Not Gustavo's Butter Chicken\nDefeated Enemies: " + game.getTotalKilledEnemyAmount() + "\nTime: " + time + "\nPuddles: " + game.getTotalPuddleAmount() + "\nWave: " + game.getWave());
 				copiedResults = true;
 			}
 			copyResultsButton.setText("Copied to Clipboard");		

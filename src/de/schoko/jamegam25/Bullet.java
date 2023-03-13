@@ -15,6 +15,7 @@ public class Bullet extends GameObject{
 	private double damage;
 	private double height;
 	private double dHeight; // change of height
+	private boolean spawnedPuddle;
 
 	public Bullet(double x, double y, double direction, double damage, Game game) {
 		super(x, y, 50);
@@ -78,6 +79,9 @@ public class Bullet extends GameObject{
 	@Override
 	public void remove() {
 		super.remove();
-		game.addObject(new Puddle(x, y, game));
+		if (!spawnedPuddle) {
+			game.addObject(new Puddle(x, y, game));
+			spawnedPuddle = true;
+		}
 	}
 }

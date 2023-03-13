@@ -593,4 +593,8 @@ public class Game extends Menu {
 	public int getTotalPuddleAmount() {
 		return totalPuddleAmount;
 	}
+
+	public int getWave() {
+		return wave;
+	}
 }
