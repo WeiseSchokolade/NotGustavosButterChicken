@@ -35,7 +35,7 @@ public class Project extends Renderer {
 	@Override
 	public void onLoad(Context context) {
 		setMenu(new LoadingMenu());
-		context.getWindow().setWindowIcon(context.getImagePool().getImage("butterChickenHQ", ASSET_PATH + "butter_chicken_hq.png", ImageLocation.JAR));
+		context.getSettings().setWindowIcon(context.getImagePool().getImage("buterChicekHQ", ASSET_PATH + "butter_chicken_hq.png", ImageLocation.JAR));
 		mainMenuButton = context.getImagePool().getImage("button", ASSET_PATH + "button.png", ImageLocation.JAR);
 	}
 
