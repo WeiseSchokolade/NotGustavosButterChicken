@@ -24,6 +24,7 @@ public class Game extends Menu {
 	public static final int BOSS_FREQUENCY = 5; // Boss every 5 waves
 	public static final int WIDTH = 20, HEIGHT = 10;
 	public static final double TILE_SIZE = 15.5;
+	public static final int MAX_PUDDLE_LEVEL = 250;
 
 	private InventoryItem[] inventory;
 	
@@ -37,7 +38,10 @@ public class Game extends Menu {
 	private int wave;
 	private double waveCooldown;
 	private Boss bossFight;
-	private int level;
+	private int puddleAmount;
+	private boolean displayedSinkingDialogue;
+
+	private AnimatedImageFrame sinkingWater;
 
 	private SceneRenderer protRenderer;
 	
@@ -117,7 +121,7 @@ public class Game extends Menu {
 		
 		// Tile setup part
 		this.tiles = genTiles();
-
+		
 		// Item Setup Part
 		inventory[0] = new InventoryItem(imagePool.getImage("apple"), 0, "Apple", "Heals you", Keyboard.ONE, (Player player) -> {
 			player.setMaxHealth(player.getMaxHealth() + 1);
@@ -155,6 +159,7 @@ public class Game extends Menu {
 
 		// Object Creation
 		player = new Player(this, context, 0, 0);
+		sinkingWater = getWaterWallTile();
 
 		playScene(new Scene(this, "Gustavo: ", "This soup is hot, maybe I can throw it using the left mouse button.", protRenderer));
 		playScene(new Scene(this, "Gustavo: ", "Oh no, I did not intend the side effect: I should not step into the puddles.", protRenderer));
@@ -235,21 +240,24 @@ public class Game extends Menu {
 			return a.getZ() - b.getZ();
 		});
 
-		int puddleAmount = 0;
+		puddleAmount = 0;
 		for (int i = 0; i < gameObjects.size(); i++) {
 			gameObjects.get(i).render(g, deltaTimeMS);
 			if (gameObjects.get(i) instanceof Puddle) {
 				puddleAmount++;
 			}
 		}
-		if (puddleAmount >= 125 && level == 0) {
-			increaseLevel();
+		if (puddleAmount >= MAX_PUDDLE_LEVEL / 2 && !displayedSinkingDialogue) {
+			displayedSinkingDialogue = true;
 			playScene(new Scene(this, "Gustavo: ", "Wait a minute... Did the ship just sink deeper?", protRenderer));
 			playScene(new Scene(this, "Gustavo: ", "Oh no... what an unintended side effect...", protRenderer));
 		}
-		if (puddleAmount >= 250 && level == 1) {
-			increaseLevel();
+		if (puddleAmount >= MAX_PUDDLE_LEVEL) {
+			// Game Over
+			getProject().setMenu(new GameOverSink(this));
 		}
+		sinkingWater.update(deltaTimeMS);
+		displayLevel(g);
 		
 		for (int i = 0; i < enemies.size(); i++) {
 			enemies.get(i).render(g, deltaTimeMS);
@@ -381,9 +389,8 @@ public class Game extends Menu {
 	}
 
 	// Makes ship heavier so it will be lower in the water and eventually sink
-	public void increaseLevel() {
-		level++;
-		for (int x = 0; x < tiles.length; x++) {
+	public void displayLevel(Graph g) {
+		/*for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				if (y == level - 1) {
 					tiles[x][y] = null;
@@ -393,14 +400,19 @@ public class Game extends Menu {
 					tiles[x][y].setShape(getWaterWallTile());
 				}
 			}
-		}
-		if (level >= 2) {
-			getProject().setMenu(new GameOverSink(this));
+		}*/
+		double y = (2.0 * puddleAmount) / ((double) MAX_PUDDLE_LEVEL) - tiles[0].length / 2.0;
+		g.addDebugString("Y: " + y);
+		g.fillRect(- tiles.length / 2, -20, tiles.length / 2, y - 0.5, Graph.getColor(55, 129, 244));
+		sinkingWater.setY(y);
+		for (int i = 0; i < tiles.length; i++) {
+			sinkingWater.setX(- tiles.length / 2 + i);
+			g.draw(sinkingWater);
 		}
 	}
 
 	public Tile[][] genTiles() {
-		Tile[][] tiles = new Tile[WIDTH + 2 + 20][HEIGHT + 2 + 8];
+		Tile[][] tiles = new Tile[WIDTH + 14][HEIGHT + 10];
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
 				String img = "tile";
@@ -503,10 +515,10 @@ public class Game extends Menu {
 				} else if (y == tiles[x].length - 4) {
 					img = "wallTopBack";
 				}
-				if (y == 0 && img != null) {
+				/*if (y == 0 && img != null) {
 					tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getWaterWallTile());
 					continue;
-				}
+				}*/
 				if (img == null) continue;
 				tiles[x][y] = new Tile(x - tiles.length / 2 + 0.5, y - tiles[x].length / 2 + 0.5, getContext().getImagePool().getImage(img), TILE_SIZE);
 			}
