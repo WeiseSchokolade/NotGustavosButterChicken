@@ -390,19 +390,7 @@ public class Game extends Menu {
 
 	// Makes ship heavier so it will be lower in the water and eventually sink
 	public void displayLevel(Graph g) {
-		/*for (int x = 0; x < tiles.length; x++) {
-			for (int y = 0; y < tiles[x].length; y++) {
-				if (y == level - 1) {
-					tiles[x][y] = null;
-				}
-				if (y == level) {
-					if (tiles[x][y] == null) continue;
-					tiles[x][y].setShape(getWaterWallTile());
-				}
-			}
-		}*/
 		double y = (2.0 * puddleAmount) / ((double) MAX_PUDDLE_LEVEL) - tiles[0].length / 2.0;
-		g.addDebugString("Y: " + y);
 		g.fillRect(- tiles.length / 2, -20, tiles.length / 2, y - 0.5, Graph.getColor(55, 129, 244));
 		sinkingWater.setY(y);
 		for (int i = 0; i < tiles.length; i++) {
