@@ -9,6 +9,7 @@ classes/
 
 target/
 pom.xml
+deploy/
 
 # eclipse
 
